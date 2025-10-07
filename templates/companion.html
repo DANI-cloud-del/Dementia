@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Companion - Silent Guardian{% endblock %}
+
+{% block content %}
+<!-- Companion Chat Interface -->
+<section class="companion-section">
+    <div class="companion-container">
+        <!-- Header -->
+        <div class="companion-header">
+            <button class="back-btn" onclick="window.location.href='home'">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="19" y1="12" x2="5" y2="12" stroke-width="2"></line>
+                    <polyline points="12 19 5 12 12 5" stroke-width="2"></polyline>
+                </svg>
+                <span>Home</span>
+            </button>
+            
+            <div class="companion-status">
+                <div class="status-indicator active"></div>
+                <span id="statusText">Ready to listen</span>
+            </div>
+            
+            <!-- Language Selector Button -->
+            <button class="language-toggle-btn" onclick="document.getElementById('languageModal').style.display='flex'">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12" stroke-width="2"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke-width="2"></path>
+                </svg>
+                <span id="currentLang">English</span>
+            </button>
+        </div>
+        
+        <!-- Main Chat Area -->
+        <div class="chat-interface">
+            <!-- AI Avatar with Animation -->
+            <div class="chat-avatar" id="chatAvatar">
+                <div class="avatar-ring"></div>
+                <div class="avatar-ring-2"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke-width="2"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v5l3 3"/>
+                </svg>
+            </div>
+            
+            <!-- Real-time Transcription Display (Glassmorphism) -->
+            <div class="transcription-overlay" id="transcriptionOverlay">
+                <div class="transcription-content">
+                    <div class="transcription-header">
+                        <div class="recording-indicator">
+                            <span class="pulse-dot"></span>
+                            <span>Listening...</span>
+                        </div>
+                    </div>
+                    <p class="transcription-text" id="transcriptionText">Start speaking...</p>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Conversation Display -->
+            <div class="conversation-display" id="conversationDisplay">
+                <div class="message ai-message">
+                    <div class="message-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke-width="2" stroke-linecap="round"></path>
+                            <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
+                            <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
+                        </svg>
+                    </div>
+                    <div class="message-content">
+                        <p>Hello! I'm your Silent Guardian. I'm here to listen to you. How are you feeling today?</p>
+                        <span class="message-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Voice Controls -->
+            <div class="voice-controls">
+                <button class="voice-button" id="voiceButton">
+                    <div class="voice-button-inner">
+                        <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke-width="2"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke-width="2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23" stroke-width="2"></line>
+                            <line x1="8" y1="23" x2="16" y2="23" stroke-width="2"></line>
+                        </svg>
+                        <svg class="stop-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: none;">
+                            <rect x="6" y="6" width="12" height="12" rx="2" stroke-width="2"></rect>
+                        </svg>
+                    </div>
+                    <span class="voice-button-text">Tap to Speak</span>
+                </button>
+                
+                <p class="voice-hint">Tap once to start, tap again to stop</p>
+            </div>
+            
+            <!-- Alternative Text Input -->
+            <div class="text-input-container">
+                <input type="text" class="text-input" id="textInput" placeholder="Or type your message here...">
+                <button class="send-btn" id="sendBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="22" y1="2" x2="11" y2="13" stroke-width="2"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2" stroke-width="2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Quick Suggestions -->
+        <div class="quick-suggestions">
+            <p class="suggestions-label">Try asking:</p>
+            <div class="suggestions-grid">
+                <button class="suggestion-chip" data-suggestion="Tell me a story">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke-width="2"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke-width="2"></path>
+                    </svg>
+                    <span>Tell me a story</span>
+                </button>
+                <button class="suggestion-chip" data-suggestion="How's the weather?">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5" stroke-width="2"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3" stroke-width="2"></line>
+                        <line x1="12" y1="21" x2="12" y2="23" stroke-width="2"></line>
+                    </svg>
+                    <span>How's the weather?</span>
+                </button>
+                <button class="suggestion-chip" data-suggestion="Let's play a game">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                        <path d="M8 12h8M12 8v8" stroke-width="2"></path>
+                    </svg>
+                    <span>Let's play a game</span>
+                </button>
+                <button class="suggestion-chip" data-suggestion="I need help">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12" stroke-width="2"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2"></line>
+                    </svg>
+                    <span>I need help</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Language Selector Modal -->
+<div class="language-modal" id="languageModal">
+    <div class="modal-backdrop" onclick="document.getElementById('languageModal').style.display='none'"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Choose Your Language</h3>
+            <button class="modal-close-btn" onclick="document.getElementById('languageModal').style.display='none'">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"></line>
+                    <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="language-options">
+            <button class="lang-option active" data-lang="en-US" data-display="English">
+                <span class="lang-flag">🇬🇧</span>
+                <span class="lang-name">English</span>
+            </button>
+            <button class="lang-option" data-lang="hi-IN" data-display="हिंदी">
+                <span class="lang-flag">🇮🇳</span>
+                <span class="lang-name">हिंदी (Hindi)</span>
+            </button>
+            <button class="lang-option" data-lang="ml-IN" data-display="മലയാളം">
+                <span class="lang-flag">🇮🇳</span>
+                <span class="lang-name">മലയാളം (Malayalam)</span>
+            </button>
+            <button class="lang-option" data-lang="ta-IN" data-display="தமிழ்">
+                <span class="lang-flag">🇮🇳</span>
+                <span class="lang-name">தமிழ் (Tamil)</span>
+            </button>
+            <button class="lang-option" data-lang="te-IN" data-display="తెలుగు">
+                <span class="lang-flag">🇮🇳</span>
+                <span class="lang-name">తెలుగు (Telugu)</span>
+            </button>
+            <button class="lang-option" data-lang="bn-IN" data-display="বাংলা">
+                <span class="lang-flag">🇮🇳</span>
+                <span class="lang-name">বাংলা (Bengali)</span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/companion.js"></script>
+{% endblock %}
