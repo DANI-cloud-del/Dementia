@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Rain on Parade{% endblock title %}</title>
     
+    <!-- Add this script in the head to prevent flash of incorrect theme -->
+    <script>
+        // Check and apply theme before page renders
+        const savedTheme = localStorage.getItem('darkMode');
+        if (savedTheme === 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    
     <!-- Custom CSS Only -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
@@ -15,12 +24,48 @@
         {% block content %}{% endblock %}
     </div>
 
-<!-- Global navbar script (loads on all pages) -->
+    <!-- Add dark mode toggle logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    try {
+                        document.documentElement.classList.toggle('dark-mode');
+                        const isDarkMode = document.documentElement.classList.contains('dark-mode');
+                        localStorage.setItem('darkMode', isDarkMode);
+                        console.log('🌓 Dark mode:', isDarkMode ? 'enabled' : 'disabled');
+                    } catch (error) {
+                        console.error('Error toggling dark mode:', error);
+                    }
+                });
+            }
+
+            // System theme preference handler
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            // Apply system preference only if user hasn't set a preference
+            if (!localStorage.getItem('darkMode')) {
+                const shouldBeDark = prefersDark.matches;
+                document.documentElement.classList.toggle('dark-mode', shouldBeDark);
+            }
+
+            // Listen for system theme changes
+            prefersDark.addEventListener('change', (e) => {
+                if (!localStorage.getItem('darkMode')) {
+                    document.documentElement.classList.toggle('dark-mode', e.matches);
+                }
+            });
+        });
+    </script>
+
+    <!-- Global navbar script (loads on all pages) -->
     <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
 
     {% block extra_js %}
-<script src="{{ url_for('static', filename='js/companion.js') }}"></script>
-{% endblock %}
+        <script src="{{ url_for('static', filename='js/companion.js') }}"></script>
+    {% endblock %}
 
 </body>
 </html>
