@@ -1,11 +1,239 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Emergency SOS - Silent Guardian{% endblock %}
+
+{% block content %}
+<section class="emergency-section" id="emergencySection">
+    <div class="emergency-container">
+        <!-- Normal State - Before Activation -->
+        <div class="emergency-initial" id="emergencyInitial">
+            <div class="emergency-header">
+                <div class="alert-icon pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12" stroke-width="2"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2"></line>
+                    </svg>
+                </div>
+                <h1>Emergency SOS</h1>
+                <p class="subtitle">Quick help when you need it most</p>
+            </div>
+
+            <!-- Emergency Information -->
+            <div class="emergency-info-card">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12" stroke-width="2"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2"></line>
+                    </svg>
+                    What Happens When You Activate SOS?
+                </h2>
+                <div class="info-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>30-Second Countdown Starts</h3>
+                            <p>You'll see a countdown timer. If this was accidental, you can cancel anytime.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Your Location is Captured</h3>
+                            <p>We automatically get your GPS location to share with emergency responders.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Alerts Sent Automatically</h3>
+                            <p>Emergency contacts, nearby hospitals, and emergency services are notified with your medical info.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Continuous Updates</h3>
+                            <p>Your family receives real-time updates about your status and location until help arrives.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Patient Info -->
+            <div class="patient-info-card">
+                <h3>Emergency Information for Rajesh Kumar</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Blood Group</span>
+                        <span class="value">B+</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Age</span>
+                        <span class="value">68 years</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Medical Condition</span>
+                        <span class="value">Early Alzheimer's, Diabetes</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Allergies</span>
+                        <span class="value">Penicillin, Shellfish</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Emergency Contact</span>
+                        <span class="value">Amit Kumar: +91 99887 76655</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Current Location</span>
+                        <span class="value" id="currentLocation">Detecting...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Big SOS Button -->
+            <div class="sos-button-container">
+                <button class="sos-button" id="activateSOS">
+                    <div class="sos-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke-width="2"></path>
+                            <line x1="12" y1="9" x2="12" y2="13" stroke-width="2"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2"></line>
+                        </svg>
+                    </div>
+                    <span class="sos-text">ACTIVATE EMERGENCY SOS</span>
+                    <span class="sos-hint">Press and hold for 2 seconds</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Emergency State - Red Alert -->
+        <div class="emergency-active" id="emergencyActive" style="display: none;">
+            <div class="red-alert-overlay"></div>
+            
+            <div class="emergency-active-content">
+                <!-- Countdown Timer -->
+                <div class="countdown-container">
+                    <div class="countdown-circle">
+                        <svg viewBox="0 0 200 200" class="countdown-svg">
+                            <circle cx="100" cy="100" r="90" class="countdown-bg"></circle>
+                            <circle cx="100" cy="100" r="90" class="countdown-progress" id="countdownProgress"></circle>
+                        </svg>
+                        <div class="countdown-text">
+                            <span class="countdown-number" id="countdownNumber">30</span>
+                            <span class="countdown-label">seconds</span>
+                        </div>
+                    </div>
+                    <h2 class="alert-message">Emergency Alert Activating</h2>
+                    <p class="alert-description">Alerts will be sent to hospitals and emergency contacts</p>
+                </div>
+
+                <!-- Cancel Button -->
+                <button class="cancel-button" id="cancelSOS">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"></line>
+                        <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"></line>
+                    </svg>
+                    <span>Cancel Emergency</span>
+                </button>
+
+                <!-- Status Updates -->
+                <div class="status-updates" id="statusUpdates">
+                    <div class="status-item">
+                        <div class="status-icon pending">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                            </svg>
+                        </div>
+                        <span>Capturing your location...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Sent State -->
+        <div class="emergency-sent" id="emergencySent" style="display: none;">
+            <div class="sent-container">
+                <div class="success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="20 6 9 17 4 12" stroke-width="3"></polyline>
+                    </svg>
+                </div>
+                <h1>Emergency Alerts Sent!</h1>
+                <p>Help is on the way. Stay calm and stay where you are if possible.</p>
+
+                <div class="sent-details">
+                    <div class="sent-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-width="2"></path>
+                            </svg>
+                            Nearest Hospital Notified
+                        </h3>
+                        <p><strong>AIIMS New Delhi</strong></p>
+                        <p>2.3 km away • ETA 8 minutes</p>
+                        <p class="phone-number">📞 +91 11 2659 3355</p>
+                    </div>
+
+                    <div class="sent-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"></path>
+                                <circle cx="9" cy="7" r="4" stroke-width="2"></circle>
+                            </svg>
+                            Emergency Contacts Alerted
+                        </h3>
+                        <p>✓ Amit Kumar (Son) - Message sent</p>
+                        <p>✓ Priya Sharma (Daughter) - Message sent</p>
+                    </div>
+
+                    <div class="sent-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"></path>
+                                <circle cx="12" cy="10" r="3" stroke-width="2"></circle>
+                            </svg>
+                            Your Location Shared
+                        </h3>
+                        <p id="sharedLocation">12/45, Lajpat Nagar, New Delhi</p>
+                        <button class="view-map-btn" onclick="openMap()">View on Map</button>
+                    </div>
+
+                    <div class="sent-card medical-info-sent">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-width="2"></path>
+                                <polyline points="14 2 14 8 20 8" stroke-width="2"></polyline>
+                            </svg>
+                            Medical Information Shared
+                        </h3>
+                        <p>✓ Blood group, allergies, and current medications</p>
+                        <p>✓ Alzheimer's diagnosis and care instructions</p>
+                        <p>✓ Doctor contact information</p>
+                    </div>
+                </div>
+
+                <div class="emergency-actions">
+                    <button class="call-emergency-btn" onclick="callEmergency()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke-width="2"></path>
+                        </svg>
+                        Call Emergency Services (102)
+                    </button>
+                    <button class="reset-button" onclick="resetEmergency()">Return to Safety</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Include Helper Bot -->
+{% include 'components/helper_bot.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/emergency.js') }}"></script>
+<script src="{{ url_for('static', filename='js/helper_bot.js') }}"></script>
+{% endblock %}

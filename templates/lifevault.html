@@ -1,11 +1,382 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lifevault</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}QR Life-Vault - Silent Guardian{% endblock %}
+
+{% block content %}
+<section class="lifevault-section">
+    <div class="lifevault-container">
+        <!-- Header -->
+        <div class="lifevault-header">
+            <div class="header-left">
+                <h1>QR Life-Vault</h1>
+                <p>Your emergency medical information accessible via QR code</p>
+            </div>
+            <div class="header-actions">
+                <button class="generate-qr-btn" id="generateQrBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="3" y="3" width="7" height="7" stroke-width="2"></rect>
+                        <rect x="14" y="3" width="7" height="7" stroke-width="2"></rect>
+                        <rect x="14" y="14" width="7" height="7" stroke-width="2"></rect>
+                        <rect x="3" y="14" width="7" height="7" stroke-width="2"></rect>
+                    </svg>
+                    <span>Generate QR Code</span>
+                </button>
+                <button class="save-vault-btn" id="saveVaultBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke-width="2"></path>
+                        <polyline points="17 21 17 13 7 13 7 21" stroke-width="2"></polyline>
+                        <polyline points="7 3 7 8 15 8" stroke-width="2"></polyline>
+                    </svg>
+                    <span>Save Changes</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Instructions Banner -->
+        <div class="info-banner">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                <line x1="12" y1="16" x2="12" y2="12" stroke-width="2"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2"></line>
+            </svg>
+            <div class="banner-content">
+                <h3>How Your Life-Vault Works</h3>
+                <p>Add your medical information, emergency contacts, and personal videos here. Generate a QR code to wear as a bracelet or keep in your wallet. In an emergency, anyone can scan it to help you, even when you can't speak.</p>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="vault-content-grid">
+            <!-- Personal Information Card -->
+            <div class="vault-card">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-width="2"></path>
+                            <circle cx="12" cy="7" r="4" stroke-width="2"></circle>
+                        </svg>
+                        Personal Information
+                    </h2>
+                    <span class="required-badge">Required</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" value="Rajesh Kumar" placeholder="Enter full name">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" value="68" placeholder="Age">
+                        </div>
+                        <div class="form-group">
+                            <label for="bloodGroup">Blood Group</label>
+                            <select id="bloodGroup">
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+" selected>B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Home Address</label>
+                        <textarea id="address" rows="3" placeholder="Enter complete home address">
+12/45, Lajpat Nagar, New Delhi - 110024, India</textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" value="+91 98765 43210" placeholder="+91">
+                        </div>
+                        <div class="form-group">
+                            <label for="language">Preferred Language</label>
+                            <select id="language">
+                                <option value="English">English</option>
+                                <option value="Hindi" selected>Hindi</option>
+                                <option value="Malayalam">Malayalam</option>
+                                <option value="Tamil">Tamil</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Contacts Card -->
+            <div class="vault-card">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke-width="2"></path>
+                        </svg>
+                        Emergency Contacts
+                    </h2>
+                    <span class="required-badge">Required</span>
+                </div>
+                <div class="card-body">
+                    <div class="contact-item">
+                        <div class="contact-header">
+                            <span class="contact-type">Primary Contact</span>
+                            <span class="contact-badge">Son</span>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" value="Amit Kumar" placeholder="Contact name">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" value="+91 99887 76655" placeholder="Phone number">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-header">
+                            <span class="contact-type">Secondary Contact</span>
+                            <span class="contact-badge">Daughter</span>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" value="Priya Sharma" placeholder="Contact name">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" value="+91 98776 65544" placeholder="Phone number">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="add-contact-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="12" y1="5" x2="12" y2="19" stroke-width="2"></line>
+                            <line x1="5" y1="12" x2="19" y2="12" stroke-width="2"></line>
+                        </svg>
+                        Add Another Contact
+                    </button>
+                </div>
+            </div>
+
+            <!-- Medical Information Card -->
+            <div class="vault-card">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-width="2"></path>
+                        </svg>
+                        Medical Information
+                    </h2>
+                    <span class="important-badge">Important</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="conditions">Medical Conditions / Diseases</label>
+                        <textarea id="conditions" rows="3" placeholder="List any medical conditions, chronic diseases, or diagnoses...">
+Early-stage Alzheimer's Disease (diagnosed 2023)
+Type 2 Diabetes (managed)
+Mild Hypertension</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="allergies">Allergies</label>
+                        <textarea id="allergies" rows="2" placeholder="List any allergies to medications, food, or other substances...">
+Penicillin - severe allergic reaction
+Shellfish - mild allergy</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medications">Current Medications</label>
+                        <div class="medication-list">
+                            <div class="medication-item">
+                                <input type="text" value="Donepezil 10mg - Once daily (for Alzheimer's)" placeholder="Medication name and dosage">
+                                <button class="remove-med-btn">×</button>
+                            </div>
+                            <div class="medication-item">
+                                <input type="text" value="Metformin 500mg - Twice daily (for Diabetes)" placeholder="Medication name and dosage">
+                                <button class="remove-med-btn">×</button>
+                            </div>
+                            <div class="medication-item">
+                                <input type="text" value="Amlodipine 5mg - Once daily (for Blood Pressure)" placeholder="Medication name and dosage">
+                                <button class="remove-med-btn">×</button>
+                            </div>
+                        </div>
+                        <button class="add-medication-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <line x1="12" y1="5" x2="12" y2="19" stroke-width="2"></line>
+                                <line x1="5" y1="12" x2="19" y2="12" stroke-width="2"></line>
+                            </svg>
+                            Add Medication
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="doctor">Primary Doctor</label>
+                            <input type="text" id="doctor" value="Dr. Sharma (Neurology)" placeholder="Doctor name & specialty">
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorPhone">Doctor's Phone</label>
+                            <input type="tel" id="doctorPhone" value="+91 11 2345 6789" placeholder="Doctor's phone">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hospital">Preferred Hospital</label>
+                        <input type="text" id="hospital" value="AIIMS New Delhi" placeholder="Hospital name">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Messages Card -->
+            <div class="vault-card video-card">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polygon points="23 7 16 12 23 17 23 7" stroke-width="2"></polygon>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke-width="2"></rect>
+                        </svg>
+                        Personal Video Messages
+                    </h2>
+                    <span class="optional-badge">Optional</span>
+                </div>
+                <div class="card-body">
+                    <div class="video-instructions">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12" stroke-width="2"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2"></line>
+                        </svg>
+                        <div>
+                            <h4>Why Add Videos?</h4>
+                            <p>Record short videos to help emergency responders understand you better. These could include:</p>
+                            <ul>
+                                <li>A message introducing yourself and your condition</li>
+                                <li>How to communicate with you if you're confused</li>
+                                <li>Important routines or things that calm you</li>
+                                <li>Family members' names and how to reach them</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="video-upload-area" id="videoUploadArea">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2"></path>
+                            <polyline points="17 8 12 3 7 8" stroke-width="2"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15" stroke-width="2"></line>
+                        </svg>
+                        <h3>Upload Video Messages</h3>
+                        <p>Drag and drop video files here, or click to browse</p>
+                        <p class="upload-hint">Maximum 3 videos, 2 minutes each (MP4, MOV, AVI)</p>
+                        <input type="file" id="videoInput" accept="video/*" multiple hidden>
+                        <button class="browse-btn" onclick="document.getElementById('videoInput').click()">
+                            Browse Files
+                        </button>
+                    </div>
+
+                    <div class="video-list" id="videoList">
+                        <!-- Uploaded videos will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes Card -->
+            <div class="vault-card">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-width="2"></path>
+                            <polyline points="14 2 14 8 20 8" stroke-width="2"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13" stroke-width="2"></line>
+                            <line x1="16" y1="17" x2="8" y2="17" stroke-width="2"></line>
+                        </svg>
+                        Additional Notes
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="notes">Important Information for Emergency Responders</label>
+                        <textarea id="notes" rows="5" placeholder="Add any other important information that might help in an emergency...">
+- May become disoriented in unfamiliar environments
+- Responds well to calm, clear instructions
+- Prefers to speak in Hindi when stressed
+- Lives with family - do not leave alone
+- Has a daily routine - disruption may cause anxiety</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" checked> Allow emergency responders to share my information with family
+                        </label>
+                        <label>
+                            <input type="checkbox" checked> Include my photo in the QR code data
+                        </label>
+                        <label>
+                            <input type="checkbox"> Send me updates when someone scans my QR code
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Code Preview Card -->
+            <div class="vault-card qr-preview-card">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="3" width="7" height="7" stroke-width="2"></rect>
+                            <rect x="14" y="3" width="7" height="7" stroke-width="2"></rect>
+                            <rect x="14" y="14" width="7" height="7" stroke-width="2"></rect>
+                            <rect x="3" y="14" width="7" height="7" stroke-width="2"></rect>
+                        </svg>
+                        Your QR Code
+                    </h2>
+                </div>
+                <div class="card-body qr-body">
+                    <div class="qr-code-display" id="qrCodeDisplay">
+                        <div class="qr-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <rect x="3" y="3" width="7" height="7" stroke-width="2"></rect>
+                                <rect x="14" y="3" width="7" height="7" stroke-width="2"></rect>
+                                <rect x="14" y="14" width="7" height="7" stroke-width="2"></rect>
+                                <rect x="3" y="14" width="7" height="7" stroke-width="2"></rect>
+                            </svg>
+                            <p>Click "Generate QR Code" to create your Life-Vault QR</p>
+                        </div>
+                    </div>
+                    <div class="qr-actions">
+                        <button class="qr-action-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2"></path>
+                                <polyline points="7 10 12 15 17 10" stroke-width="2"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3" stroke-width="2"></line>
+                            </svg>
+                            Download QR
+                        </button>
+                        <button class="qr-action-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <polyline points="6 9 6 2 18 2 18 9" stroke-width="2"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" stroke-width="2"></path>
+                                <rect x="6" y="14" width="12" height="8" stroke-width="2"></rect>
+                            </svg>
+                            Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Include Helper Bot -->
+{% include 'components/helper_bot.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/lifevault.js') }}"></script>
+<script src="{{ url_for('static', filename='js/helper_bot.js') }}"></script>
+{% endblock %}

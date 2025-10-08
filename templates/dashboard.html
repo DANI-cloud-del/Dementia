@@ -1,11 +1,378 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Health Dashboard - Silent Guardian{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="dashboard-container">
+        <!-- Header with Quick Actions -->
+        <div class="dashboard-header">
+            <div class="header-left">
+                <h1>Health Dashboard</h1>
+                <p class="patient-name">Monitoring: <strong>Rajesh Kumar</strong></p>
+            </div>
+            <div class="header-actions">
+                <button class="share-btn" id="shareBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="18" cy="5" r="3" stroke-width="2"></circle>
+                        <circle cx="6" cy="12" r="3" stroke-width="2"></circle>
+                        <circle cx="18" cy="19" r="3" stroke-width="2"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" stroke-width="2"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" stroke-width="2"></line>
+                    </svg>
+                    <span>Share Report</span>
+                </button>
+                <button class="download-btn" id="downloadBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2"></path>
+                        <polyline points="7 10 12 15 17 10" stroke-width="2"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3" stroke-width="2"></line>
+                    </svg>
+                    <span>Download PDF</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Status Cards -->
+        <div class="status-grid">
+            <div class="status-card good">
+                <div class="status-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-width="2"></path>
+                        <polyline points="22 4 12 14.01 9 11.01" stroke-width="2"></polyline>
+                    </svg>
+                </div>
+                <div class="status-info">
+                    <h3>Overall Status</h3>
+                    <p class="status-value">Good</p>
+                    <span class="status-detail">Regular activity maintained</span>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <div class="status-info">
+                    <h3>Conversations</h3>
+                    <p class="status-value">23</p>
+                    <span class="status-detail">This week</span>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                        <polyline points="12 6 12 12 16 14" stroke-width="2"></polyline>
+                    </svg>
+                </div>
+                <div class="status-info">
+                    <h3>Avg. Response Time</h3>
+                    <p class="status-value">2.3s</p>
+                    <span class="status-detail">Consistent</span>
+                </div>
+            </div>
+
+            <div class="status-card warning">
+                <div class="status-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke-width="2"></path>
+                        <line x1="12" y1="9" x2="12" y2="13" stroke-width="2"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2"></line>
+                    </svg>
+                </div>
+                <div class="status-info">
+                    <h3>Alerts</h3>
+                    <p class="status-value">2</p>
+                    <span class="status-detail">Minor concerns</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Summary -->
+        <div class="weekly-summary">
+            <h2>This Week's Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 20v-6M6 20V10M18 20V4" stroke-width="2" stroke-linecap="round"></path>
+                        </svg>
+                        Activity Level
+                    </h3>
+                    <div class="activity-bars">
+                        <div class="day-bar">
+                            <span>Mon</span>
+                            <div class="bar"><div class="bar-fill" style="height: 80%;"></div></div>
+                        </div>
+                        <div class="day-bar">
+                            <span>Tue</span>
+                            <div class="bar"><div class="bar-fill" style="height: 75%;"></div></div>
+                        </div>
+                        <div class="day-bar">
+                            <span>Wed</span>
+                            <div class="bar"><div class="bar-fill" style="height: 85%;"></div></div>
+                        </div>
+                        <div class="day-bar">
+                            <span>Thu</span>
+                            <div class="bar"><div class="bar-fill" style="height: 70%;"></div></div>
+                        </div>
+                        <div class="day-bar">
+                            <span>Fri</span>
+                            <div class="bar"><div class="bar-fill" style="height: 90%;"></div></div>
+                        </div>
+                        <div class="day-bar">
+                            <span>Sat</span>
+                            <div class="bar"><div class="bar-fill" style="height: 65%;"></div></div>
+                        </div>
+                        <div class="day-bar active">
+                            <span>Sun</span>
+                            <div class="bar"><div class="bar-fill" style="height: 88%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke-width="2" stroke-linecap="round"></path>
+                            <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
+                            <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
+                        </svg>
+                        Mood & Sentiment
+                    </h3>
+                    <div class="mood-indicators">
+                        <div class="mood-row">
+                            <span class="mood-emoji">😊</span>
+                            <span class="mood-label">Positive</span>
+                            <div class="mood-bar">
+                                <div class="mood-fill positive" style="width: 65%;"></div>
+                            </div>
+                            <span class="mood-percent">65%</span>
+                        </div>
+                        <div class="mood-row">
+                            <span class="mood-emoji">😐</span>
+                            <span class="mood-label">Neutral</span>
+                            <div class="mood-bar">
+                                <div class="mood-fill neutral" style="width: 25%;"></div>
+                            </div>
+                            <span class="mood-percent">25%</span>
+                        </div>
+                        <div class="mood-row">
+                            <span class="mood-emoji">😔</span>
+                            <span class="mood-label">Negative</span>
+                            <div class="mood-bar">
+                                <div class="mood-fill negative" style="width: 10%;"></div>
+                            </div>
+                            <span class="mood-percent">10%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="recent-activities">
+            <h2>Recent Activities</h2>
+            <div class="activity-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-time">Today, 10:30 AM</span>
+                        <h4>Morning Conversation</h4>
+                        <p>Discussed news and weather. Clear responses, good recall.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-time">Yesterday, 2:15 PM</span>
+                        <h4>Memory Game Completed</h4>
+                        <p>Score: 8/10. Remembered words correctly after 30 seconds.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-time">Yesterday, 6:00 PM</span>
+                        <h4>Evening Story Telling</h4>
+                        <p>Shared childhood memories. Coherent narrative, good detail.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clinical Insights Section (For Doctors/Judges) -->
+        <div class="clinical-section">
+            <div class="section-header">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-width="2"></path>
+                        <polyline points="14 2 14 8 20 8" stroke-width="2"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13" stroke-width="2"></line>
+                        <line x1="16" y1="17" x2="8" y2="17" stroke-width="2"></line>
+                    </svg>
+                    Clinical Insights (Doctor's View)
+                </h2>
+                <span class="info-badge">Medical professionals can review detailed analytics here</span>
+            </div>
+
+            <div class="clinical-grid">
+                <!-- Cognitive Metrics -->
+                <div class="clinical-card">
+                    <h3>Cognitive Metrics</h3>
+                    <div class="metric-list">
+                        <div class="metric-item">
+                            <span class="metric-label">Memory Recall</span>
+                            <div class="metric-bar-container">
+                                <div class="metric-bar good" style="width: 78%;"></div>
+                            </div>
+                            <span class="metric-value">78%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Speech Fluency</span>
+                            <div class="metric-bar-container">
+                                <div class="metric-bar good" style="width: 82%;"></div>
+                            </div>
+                            <span class="metric-value">82%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Response Time</span>
+                            <div class="metric-bar-container">
+                                <div class="metric-bar warning" style="width: 65%;"></div>
+                            </div>
+                            <span class="metric-value">65%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Attention Span</span>
+                            <div class="metric-bar-container">
+                                <div class="metric-bar good" style="width: 75%;"></div>
+                            </div>
+                            <span class="metric-value">75%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Speech Analysis -->
+                <div class="clinical-card">
+                    <h3>Speech Pattern Analysis</h3>
+                    <div class="speech-metrics">
+                        <div class="speech-stat">
+                            <span class="stat-label">Words per Minute</span>
+                            <span class="stat-value">125</span>
+                            <span class="stat-trend good">↑ 5%</span>
+                        </div>
+                        <div class="speech-stat">
+                            <span class="stat-label">Vocabulary Diversity</span>
+                            <span class="stat-value">High</span>
+                            <span class="stat-trend good">Stable</span>
+                        </div>
+                        <div class="speech-stat">
+                            <span class="stat-label">Filler Words</span>
+                            <span class="stat-value">12%</span>
+                            <span class="stat-trend">Normal</span>
+                        </div>
+                        <div class="speech-stat">
+                            <span class="stat-label">Coherence Score</span>
+                            <span class="stat-value">8.5/10</span>
+                            <span class="stat-trend good">Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Indicators -->
+                <div class="clinical-card alert-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12" stroke-width="2"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2"></line>
+                        </svg>
+                        Early Warning Indicators
+                    </h3>
+                    <div class="alert-list">
+                        <div class="alert-item low">
+                            <div class="alert-dot"></div>
+                            <div class="alert-content">
+                                <strong>Slight pause increase</strong>
+                                <p>Mid-sentence pauses increased by 8% this week</p>
+                            </div>
+                        </div>
+                        <div class="alert-item low">
+                            <div class="alert-dot"></div>
+                            <div class="alert-content">
+                                <strong>Evening fatigue pattern</strong>
+                                <p>Reduced engagement after 6 PM on 3 occasions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="clinical-card recommendation-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 2a10 10 0 0 1 7.07 17.07l.93.93a1 1 0 0 1 0 1.41l-1.41 1.41a1 1 0 0 1-1.41 0l-.93-.93A10 10 0 1 1 12 2z" stroke-width="2"></path>
+                            <path d="M12 6v6l4 2" stroke-width="2"></path>
+                        </svg>
+                        AI Recommendations
+                    </h3>
+                    <ul class="recommendation-list">
+                        <li>✓ Continue daily conversation activities</li>
+                        <li>✓ Increase memory game frequency to 2x daily</li>
+                        <li>✓ Monitor evening engagement patterns</li>
+                        <li>✓ Schedule follow-up assessment in 2 weeks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Share Modal -->
+        <div class="share-modal" id="shareModal">
+            <div class="modal-backdrop" onclick="closeShareModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Share Health Report</h3>
+                    <button class="modal-close" onclick="closeShareModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="share-option">
+                        <input type="email" placeholder="Doctor's Email" class="share-input" />
+                        <button class="share-action-btn primary">Send to Doctor</button>
+                    </div>
+                    <div class="share-option">
+                        <input type="email" placeholder="Family Member's Email" class="share-input" />
+                        <button class="share-action-btn">Send to Family</button>
+                    </div>
+                    <div class="share-divider">or</div>
+                    <div class="share-link-section">
+                        <p>Share via link (valid for 7 days)</p>
+                        <div class="link-copy">
+                            <input type="text" value="https://silentguardian.ai/report/abc123" readonly />
+                            <button class="copy-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-width="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"></path>
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Include Helper Bot Component -->
+{% include 'components/helper_bot.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/helper_bot.js') }}"></script>
+{% endblock %}
