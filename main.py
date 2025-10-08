@@ -84,5 +84,10 @@ def voice_to_text():
         'confidence': 0.95
     })
 
+@app.route('/logout')
+def logout():
+    """Logout user"""
+    return render_template('logout.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

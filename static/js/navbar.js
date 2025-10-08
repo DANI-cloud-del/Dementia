@@ -1,56 +1,43 @@
 // ============================================
 // NAVIGATION BAR - MOBILE MENU & DROPDOWNS
 // Mobile menu, profile dropdown, active links
-// (Dark mode handled in base.html)
 // ============================================
 
 console.log('✅ Navbar.js loaded');
 
-// Elements
+// Elements - MATCHING YOUR HTML IDs
 const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-const navLinks = document.getElementById('navLinks');
-const profileDropdownToggle = document.getElementById('profileDropdownToggle');
-const profileDropdown = document.getElementById('profileDropdown');
+const mobileNav = document.getElementById('mobileNav');
+const userToggle = document.getElementById('userToggle');
+const userDropdown = document.getElementById('userDropdown');
+const themeToggle = document.getElementById('themeToggle');
 
 let mobileMenuOpen = false;
-let profileDropdownOpen = false;
+let userDropdownOpen = false;
 
 // Mobile Menu Toggle
-if (mobileMenuToggle && navLinks) {
+if (mobileMenuToggle && mobileNav) {
     mobileMenuToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         mobileMenuOpen = !mobileMenuOpen;
         
-        navLinks.classList.toggle('active');
+        mobileNav.classList.toggle('active');
         mobileMenuToggle.classList.toggle('active');
         
-        // Update hamburger icon
-        const bars = mobileMenuToggle.querySelectorAll('.bar');
+        // Prevent body scrolling when menu is open
         if (mobileMenuOpen) {
-            bars[0].style.transform = 'rotate(-45deg) translate(-5px, 6px)';
-            bars[1].style.opacity = '0';
-            bars[2].style.transform = 'rotate(45deg) translate(-5px, -6px)';
-            
-            // Prevent body scrolling when menu is open
             document.body.style.overflow = 'hidden';
-            
             console.log('📱 Mobile menu opened');
         } else {
-            bars[0].style.transform = 'none';
-            bars[1].style.opacity = '1';
-            bars[2].style.transform = 'none';
-            
-            // Restore body scrolling
             document.body.style.overflow = '';
-            
             console.log('📱 Mobile menu closed');
         }
     });
 }
 
 // Close mobile menu when clicking a link
-const navLinkItems = document.querySelectorAll('.nav-link');
-navLinkItems.forEach(link => {
+const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+mobileNavLinks.forEach(link => {
     link.addEventListener('click', () => {
         if (mobileMenuOpen) {
             mobileMenuToggle.click();
@@ -60,32 +47,32 @@ navLinkItems.forEach(link => {
 
 // Close mobile menu when clicking outside
 document.addEventListener('click', (e) => {
-    if (mobileMenuOpen && navLinks && mobileMenuToggle) {
-        if (!navLinks.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+    if (mobileMenuOpen && mobileNav && mobileMenuToggle) {
+        if (!mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
             console.log('👆 Clicked outside - closing mobile menu');
             mobileMenuToggle.click();
         }
     }
 });
 
-// Profile Dropdown Toggle
-if (profileDropdownToggle && profileDropdown) {
-    profileDropdownToggle.addEventListener('click', (e) => {
+// User Dropdown Toggle
+if (userToggle && userDropdown) {
+    userToggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        profileDropdownOpen = !profileDropdownOpen;
-        profileDropdown.classList.toggle('active');
+        userDropdownOpen = !userDropdownOpen;
+        userDropdown.classList.toggle('active');
         
-        console.log(profileDropdownOpen ? '👤 Profile dropdown opened' : '👤 Profile dropdown closed');
+        console.log(userDropdownOpen ? '👤 User dropdown opened' : '👤 User dropdown closed');
     });
 }
 
-// Close profile dropdown when clicking outside
+// Close user dropdown when clicking outside
 document.addEventListener('click', (e) => {
-    if (profileDropdownOpen && profileDropdown && profileDropdownToggle) {
-        if (!profileDropdown.contains(e.target) && !profileDropdownToggle.contains(e.target)) {
-            console.log('👆 Clicked outside - closing profile dropdown');
-            profileDropdownOpen = false;
-            profileDropdown.classList.remove('active');
+    if (userDropdownOpen && userDropdown && userToggle) {
+        if (!userDropdown.contains(e.target) && !userToggle.contains(e.target)) {
+            console.log('👆 Clicked outside - closing user dropdown');
+            userDropdownOpen = false;
+            userDropdown.classList.remove('active');
         }
     }
 });
@@ -96,9 +83,9 @@ document.addEventListener('keydown', (e) => {
         if (mobileMenuOpen && mobileMenuToggle) {
             mobileMenuToggle.click();
         }
-        if (profileDropdownOpen && profileDropdown) {
-            profileDropdownOpen = false;
-            profileDropdown.classList.remove('active');
+        if (userDropdownOpen && userDropdown) {
+            userDropdownOpen = false;
+            userDropdown.classList.remove('active');
         }
     }
 });
@@ -106,7 +93,7 @@ document.addEventListener('keydown', (e) => {
 // Highlight Active Page
 function highlightActivePage() {
     const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-link');
+    const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
     
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
@@ -153,9 +140,9 @@ window.addEventListener('scroll', () => {
 });
 
 // Logout functionality
-const logoutBtn = document.querySelector('.dropdown-item[href*="logout"]');
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', (e) => {
+const logoutLinks = document.querySelectorAll('a[href="/logout"]');
+logoutLinks.forEach(logoutLink => {
+    logoutLink.addEventListener('click', (e) => {
         e.preventDefault();
         
         const confirmLogout = confirm('Are you sure you want to logout?');
@@ -171,7 +158,7 @@ if (logoutBtn) {
             window.location.href = '/logout';
         }
     });
-}
+});
 
 // Add CSS for smooth transitions
 const style = document.createElement('style');
@@ -179,9 +166,26 @@ style.textContent = `
     .navbar {
         transition: box-shadow 0.3s ease;
     }
+    
+    .mobile-nav {
+        transition: transform 0.3s ease;
+    }
+    
+    .mobile-nav.active {
+        transform: translateX(0);
+    }
+    
+    .user-dropdown {
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .user-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+    }
 `;
 document.head.appendChild(style);
 
 console.log('✅ Navbar initialization complete');
 console.log('📱 Mobile menu: Ready');
-console.log('👤 Profile dropdown: Ready');
+console.log('👤 User dropdown: Ready');
