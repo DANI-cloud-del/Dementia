@@ -160,31 +160,37 @@ logoutLinks.forEach(logoutLink => {
     });
 });
 
-// Add CSS for smooth transitions
-const style = document.createElement('style');
-style.textContent = `
-    .navbar {
-        transition: box-shadow 0.3s ease;
-    }
-    
-    .mobile-nav {
-        transition: transform 0.3s ease;
-    }
-    
-    .mobile-nav.active {
-        transform: translateX(0);
-    }
-    
-    .user-dropdown {
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    
-    .user-dropdown.active {
-        opacity: 1;
-        visibility: visible;
-    }
-`;
-document.head.appendChild(style);
+// Add transitions style once when document loads
+document.addEventListener('DOMContentLoaded', () => {
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        .navbar {
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .mobile-nav {
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-nav.active {
+            transform: translateX(0);
+        }
+        
+        .user-dropdown {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .mobile-toggle span {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+    `;
+    document.head.appendChild(styleSheet);
+});
 
 console.log('✅ Navbar initialization complete');
 console.log('📱 Mobile menu: Ready');

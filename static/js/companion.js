@@ -1,6 +1,6 @@
 // ============================================
 // COMPANION PAGE - VOICE RECOGNITION & CHAT
-// Enhanced with Visual Feedback
+// ULTIMATE FIX: Stops mic during TTS + Better voices
 // ============================================
 
 let isListening = false;
@@ -8,12 +8,15 @@ let recognition;
 let conversationHistory = [];
 let currentLanguage = 'en-US';
 let interimTranscript = '';
+let isSpeaking = false;
+let shouldRestartAfterSpeaking = false; // ✅ NEW: Track if we should restart
 
 // Initialize Speech Recognition
 function initSpeechRecognition() {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
+        
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.lang = currentLanguage;
@@ -26,6 +29,12 @@ function initSpeechRecognition() {
         };
         
         recognition.onresult = (event) => {
+            // ✅ CRITICAL: Ignore ALL results while speaking
+            if (isSpeaking) {
+                console.log('🔇 [BLOCKED] Ignoring recognition - AI is speaking');
+                return;
+            }
+            
             let interim = '';
             let final = '';
             
@@ -43,17 +52,16 @@ function initSpeechRecognition() {
                 }
             }
             
-            // Update transcription display with real-time feedback
+            // Update transcription display
             const transcriptionText = document.getElementById('transcriptionText');
+            
             if (interim) {
                 transcriptionText.textContent = interim;
                 interimTranscript = interim;
-                // Add pulsing effect to show it's working
                 transcriptionText.style.opacity = '1';
             }
             
             if (final) {
-                // Flash the text to show it's finalized
                 transcriptionText.style.fontWeight = 'bold';
                 setTimeout(() => {
                     transcriptionText.style.fontWeight = 'normal';
@@ -62,7 +70,6 @@ function initSpeechRecognition() {
                 addMessage(final, 'user');
                 sendToAI(final);
                 
-                // Reset after a brief moment
                 setTimeout(() => {
                     transcriptionText.textContent = 'Start speaking...';
                     transcriptionText.style.opacity = '0.6';
@@ -74,15 +81,20 @@ function initSpeechRecognition() {
         
         recognition.onerror = (event) => {
             console.error('❌ Speech recognition error:', event.error);
+            
+            // Don't show error if we intentionally stopped it
+            if (event.error === 'aborted' || event.error === 'no-speech') {
+                return;
+            }
+            
             updateUIForListening(false);
             
             let errorMessage = 'Sorry, I couldn\'t hear that clearly.';
-            if (event.error === 'no-speech') {
-                errorMessage = 'I didn\'t hear anything. Please try again.';
-            } else if (event.error === 'audio-capture') {
+            
+            if (event.error === 'audio-capture') {
                 errorMessage = 'No microphone found. Please check your device settings.';
             } else if (event.error === 'not-allowed') {
-                errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings.';
+                errorMessage = 'Microphone access denied. Please allow microphone access.';
             }
             
             showNotification(errorMessage, 'error');
@@ -90,21 +102,26 @@ function initSpeechRecognition() {
         
         recognition.onend = () => {
             console.log('⏹️ Speech recognition ended');
-            if (isListening) {
-                // Restart if user didn't manually stop
+            isListening = false;
+            
+            // ✅ CRITICAL: Only restart if NOT speaking
+            if (shouldRestartAfterSpeaking && !isSpeaking) {
+                console.log('🔄 Restarting recognition (was requested)');
                 try {
                     recognition.start();
+                    shouldRestartAfterSpeaking = false;
                 } catch (error) {
                     console.error('Error restarting recognition:', error);
-                    isListening = false;
                     updateUIForListening(false);
                 }
+            } else {
+                updateUIForListening(false);
             }
         };
         
         return true;
     } else {
-        showNotification('Voice recognition is not supported in your browser. Please use Chrome or Edge.', 'error');
+        showNotification('Voice recognition is not supported in your browser.', 'error');
         return false;
     }
 }
@@ -122,6 +139,7 @@ if (voiceButton) {
         
         if (isListening) {
             console.log('⏹️ Stopping listening...');
+            shouldRestartAfterSpeaking = false;
             stopListening();
         } else {
             console.log('🎤 Starting listening...');
@@ -133,13 +151,13 @@ if (voiceButton) {
 function startListening() {
     try {
         recognition.start();
-        isListening = true;
+        shouldRestartAfterSpeaking = true; // Will auto-restart after TTS
         console.log('✅ Recognition started successfully');
     } catch (error) {
         console.error('❌ Error starting recognition:', error);
-        // If already started, just update UI
         if (error.message.includes('already started')) {
             isListening = true;
+            shouldRestartAfterSpeaking = true;
             updateUIForListening(true);
         }
     }
@@ -147,9 +165,15 @@ function startListening() {
 
 function stopListening() {
     if (recognition) {
-        recognition.stop();
-        isListening = false;
-        updateUIForListening(false);
+        try {
+            recognition.stop();
+            isListening = false;
+            shouldRestartAfterSpeaking = false;
+            updateUIForListening(false);
+            console.log('✅ Recognition stopped');
+        } catch (error) {
+            console.error('Error stopping recognition:', error);
+        }
     }
 }
 
@@ -171,8 +195,6 @@ function updateUIForListening(listening) {
         micIcon.style.display = 'none';
         stopIcon.style.display = 'block';
         voiceButtonText.textContent = 'Tap to Stop';
-        
-        // Add glowing animation to the button
         voiceButton.style.boxShadow = '0 8px 32px rgba(229, 125, 125, 0.6), 0 0 60px rgba(229, 125, 125, 0.4)';
     } else {
         console.log('🔴 UI: Listening mode OFF');
@@ -202,7 +224,6 @@ const textInput = document.getElementById('textInput');
 if (sendBtn) {
     sendBtn.addEventListener('click', () => {
         const message = textInput.value.trim();
-        
         if (message) {
             console.log('💬 Sending text message:', message);
             addMessage(message, 'user');
@@ -212,7 +233,6 @@ if (sendBtn) {
     });
 }
 
-// Enter key to send
 if (textInput) {
     textInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -237,34 +257,27 @@ function addMessage(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
     
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const currentTime = new Date().toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
     
     let avatarSVG = '';
     if (sender === 'ai') {
-        avatarSVG = `
-            <div class="message-avatar">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
-                    <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke-width="2" stroke-linecap="round"></path>
-                    <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
-                    <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
-                </svg>
-            </div>
-        `;
+        avatarSVG = `<svg class="message-avatar" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+        </svg>`;
     } else {
-        avatarSVG = `
-            <div class="message-avatar">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-width="2"></path>
-                    <circle cx="12" cy="7" r="4" stroke-width="2"></circle>
-                </svg>
-            </div>
-        `;
+        avatarSVG = `<svg class="message-avatar" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>`;
     }
     
     messageDiv.innerHTML = `
         ${avatarSVG}
-        <div class="message-content">
+        <div class="message-bubble">
             <p>${text}</p>
             <span class="message-time">${currentTime}</span>
         </div>
@@ -273,7 +286,12 @@ function addMessage(text, sender) {
     conversationDisplay.appendChild(messageDiv);
     conversationDisplay.scrollTop = conversationDisplay.scrollHeight;
     
-    conversationHistory.push({ sender, text, timestamp: new Date() });
+    conversationHistory.push({
+        sender,
+        text,
+        timestamp: new Date()
+    });
+    
     console.log('📝 Message added to conversation');
 }
 
@@ -287,22 +305,24 @@ async function sendToAI(message) {
     typingDiv.className = 'message ai-message typing-indicator';
     typingDiv.id = 'typingIndicator';
     typingDiv.innerHTML = `
-        <div class="message-avatar">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
-                <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke-width="2" stroke-linecap="round"></path>
-            </svg>
-        </div>
-        <div class="message-content">
-            <div class="typing-dots">
-                <span></span><span></span><span></span>
-            </div>
+        <svg class="message-avatar" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+        </svg>
+        <div class="typing-dots">
+            <span></span><span></span><span></span>
         </div>
     `;
+    
     conversationDisplay.appendChild(typingDiv);
     conversationDisplay.scrollTop = conversationDisplay.scrollHeight;
-    
+
     try {
+        const historyForBackend = conversationHistory.map(msg => ({
+            role: msg.sender === 'user' ? 'user' : 'assistant',
+            content: msg.text
+        }));
+
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -310,146 +330,169 @@ async function sendToAI(message) {
             },
             body: JSON.stringify({
                 message: message,
-                language: currentLanguage,
-                history: conversationHistory.slice(-10)
+                history: historyForBackend.slice(-10)
             })
         });
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
         console.log('✅ AI response received:', data);
-        
-        // Remove typing indicator
+
         const typingIndicator = document.getElementById('typingIndicator');
         if (typingIndicator) {
             typingIndicator.remove();
         }
-        
-        // Add AI response
-        addMessage(data.message, 'ai');
-        speak(data.message);
-        
+
+        if (data.success && data.response) {
+            const aiResponse = data.response;
+            addMessage(aiResponse, 'ai');
+            
+            // ✅ FIXED: Speak with enhanced voice
+            speak(aiResponse);
+            
+            console.log(`✅ Response from: ${data.provider}`);
+        } else {
+            throw new Error('Invalid response format');
+        }
+
     } catch (error) {
         console.error('❌ Error sending message:', error);
         const typingIndicator = document.getElementById('typingIndicator');
         if (typingIndicator) {
             typingIndicator.remove();
         }
-        addMessage('I\'m having trouble connecting right now. Please try again in a moment.', 'ai');
+        addMessage('I\'m having trouble connecting right now. Try again in a moment.', 'ai');
     }
 }
 
-// Text-to-Speech
+// ✅ ULTIMATE FIX: Enhanced TTS with proper mic control
 function speak(text) {
+    // Remove emojis
+    const cleanText = text
+        .replace(/[\u{1F600}-\u{1F64F}]/gu, '')
+        .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
+        .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')
+        .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '')
+        .replace(/[\u{2600}-\u{26FF}]/gu, '')
+        .replace(/[\u{2700}-\u{27BF}]/gu, '')
+        .replace(/[\u{FE00}-\u{FE0F}]/gu, '')
+        .replace(/[\u{1F900}-\u{1F9FF}]/gu, '')
+        .replace(/[\u{1FA70}-\u{1FAFF}]/gu, '')
+        .replace(/😊|😁|😃|😄|🙂|👍|❤️|💙|🌟|✨|🎮|🆔|🚨|🧭|📖/g, '')
+        .trim();
+    
+    console.log('🔊 Speaking (cleaned):', cleanText);
+    
     if ('speechSynthesis' in window) {
-        console.log('🔊 Speaking:', text);
-        // Stop any ongoing speech
+        // ✅ CRITICAL: STOP MICROPHONE BEFORE SPEAKING
+        const wasListening = isListening;
+        if (wasListening) {
+            console.log('🛑 STOPPING microphone before TTS');
+            recognition.stop();
+            shouldRestartAfterSpeaking = true;
+        }
+        
+        isSpeaking = true;
         window.speechSynthesis.cancel();
         
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;
-        utterance.pitch = 1;
-        utterance.volume = 1;
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        
+        // ✅ KEEP DEFAULT VOICE - just set basic parameters
         utterance.lang = currentLanguage;
+        utterance.rate = 0.9;    // Original speed
+        utterance.pitch = 1.0;   // Original pitch
+        utterance.volume = 1.0;
+        
+        utterance.onstart = () => {
+            console.log('🔊 TTS started - Microphone STOPPED');
+            const chatAvatar = document.getElementById('chatAvatar');
+            if (chatAvatar) {
+                chatAvatar.style.animation = 'speak-pulse 0.5s ease-in-out infinite';
+            }
+        };
+        
+        utterance.onend = () => {
+            console.log('🔇 TTS ended');
+            isSpeaking = false;
+            
+            // Reset avatar
+            const chatAvatar = document.getElementById('chatAvatar');
+            if (chatAvatar) {
+                chatAvatar.style.animation = 'gentle-pulse 3s ease-in-out infinite';
+            }
+            
+            // ✅ CRITICAL: RESTART MICROPHONE AFTER DELAY
+            if (shouldRestartAfterSpeaking) {
+                console.log('⏳ Waiting 500ms before restarting mic...');
+                setTimeout(() => {
+                    if (shouldRestartAfterSpeaking && !isListening) {
+                        console.log('🎤 RESTARTING microphone after TTS');
+                        try {
+                            recognition.start();
+                        } catch (error) {
+                            console.error('Error restarting:', error);
+                            shouldRestartAfterSpeaking = false;
+                        }
+                    }
+                }, 500); // 500ms delay
+            }
+        };
+        
+        utterance.onerror = (error) => {
+            console.error('❌ TTS error:', error);
+            isSpeaking = false;
+            
+            // Restart mic if there was an error
+            if (shouldRestartAfterSpeaking) {
+                setTimeout(() => {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error('Error restarting after TTS error:', e);
+                    }
+                }, 500);
+            }
+        };
         
         window.speechSynthesis.speak(utterance);
     }
 }
 
-// Language Selection
-document.querySelectorAll('.lang-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-        // Update active state
-        document.querySelectorAll('.lang-option').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Update language
-        currentLanguage = btn.getAttribute('data-lang');
-        const displayName = btn.getAttribute('data-display');
-        document.getElementById('currentLang').textContent = displayName;
-        
-        // Update recognition language
-        if (recognition) {
-            recognition.lang = currentLanguage;
-            console.log('🌐 Language changed to:', currentLanguage);
-        }
-        
-        // Close modal
-        document.getElementById('languageModal').style.display = 'none';
-        
-        showNotification(`Language changed to ${displayName}`, 'success');
-    });
-});
-
-// Notification System
+// Show Notification
 function showNotification(message, type = 'info') {
-    console.log(`📢 Notification (${type}):`, message);
-    
     const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
+    notification.className = `notification ${type}`;
     notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 24px;
-        background: var(--bg-card);
-        color: var(--text-primary);
-        padding: 16px 24px;
-        border-radius: 12px;
-        box-shadow: 0 8px 24px var(--shadow);
-        z-index: 3000;
-        animation: slide-in-right 0.3s ease;
-        border-left: 4px solid var(--primary);
-        font-size: 16px;
-        max-width: 300px;
-    `;
-    
-    if (type === 'error') {
-        notification.style.borderLeftColor = 'var(--error)';
-    } else if (type === 'success') {
-        notification.style.borderLeftColor = 'var(--success)';
-    }
-    
     document.body.appendChild(notification);
     
     setTimeout(() => {
-        notification.style.animation = 'slide-out-right 0.3s ease';
+        notification.style.animation = 'slideOut 0.3s ease forwards';
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Companion page loaded. Initializing...');
+    console.log('🚀 Companion page loaded');
     
-    // Check for microphone permissions
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(() => {
-                console.log('✅ Microphone access granted');
-                showNotification('Microphone ready!', 'success');
-            })
-            .catch((error) => {
-                console.error('❌ Microphone access denied:', error);
-                showNotification('Please allow microphone access to use voice features', 'error');
-            });
+    // Load voices
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => {
+            const voices = window.speechSynthesis.getVoices();
+            console.log('🎵 Available voices:', voices.map(v => v.name));
+        };
     }
     
-    initSpeechRecognition();
+    // Auto-greet after 1 second
+    setTimeout(() => {
+        const greeting = "Hello! I'm your Silent Guardian. I'm here to listen to you. How are you feeling today?";
+        addMessage(greeting, 'ai');
+        speak(greeting);
+    }, 1000);
 });
 
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-    console.log('🔄 Page unloading. Cleaning up...');
-    if (recognition) {
-        recognition.stop();
-    }
-    if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-    }
-});
-
-console.log('✅ Companion.js loaded successfully!');
+console.log('✅ Companion script loaded');
