@@ -1,0 +1,84 @@
+<!-- Mini Helper Chatbot Component -->
+<div class="helper-bot-container" id="helperBot">
+    <button class="helper-bot-toggle" id="helperBotToggle" aria-label="Open helper">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="helper-icon">
+            ircle cx="12" cy="12" r="10" stroke-width="="2"></circle>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke-width="2" stroke-linecap="round"></path>
+            <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="close-icon" style="display: none;">
+            <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"></line>
+            <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"></line>
+        </svg>
+    </button>
+    
+    <div class="helper-bot-panel" id="helperBotPanel">
+        <div class="helper-bot-header">
+            <div class="helper-bot-avatar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    ircle cx="12" cy="12" r="10" stroke-width="="2"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke-width="2" stroke-linecap="round"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2" stroke-linecap="round"></line>
+                </svg>
+            </div>
+            <div class="helper-bot-info">
+                <h4>Helper</h4>
+                <p id="helperStatus">I'm here to guide you</p>
+            </div>
+        </div>
+        
+        <!-- Real-time Voice Transcript Overlay -->
+        <div class="voice-transcript-overlay" id="voiceTranscriptOverlay">
+            <div class="transcript-indicator">
+                <div class="listening-animation">
+                    <span class="pulse-ring"></span>
+                    <span class="pulse-ring delay-1"></span>
+                    <span class="pulse-ring delay-2"></span>
+                </div>
+                <p class="listening-text">Listening...</p>
+            </div>
+            <p class="live-transcript" id="liveTranscript">Start speaking...</p>
+            <button class="stop-listening-btn" id="stopListeningBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="6" y="6" width="12" height="12" rx="2" stroke-width="2"></rect>
+                </svg>
+                <span>Stop & Send</span>
+            </button>
+        </div>
+        
+        <div class="helper-bot-messages" id="helperBotMessages">
+            <div class="helper-message">
+                <p>Hi! I'm here to help you. Click on any activity to get started, or ask me questions!</p>
+            </div>
+        </div>
+        
+        <div class="helper-bot-quick-help">
+            <button class="help-chip" data-help="how-to-start">How do I start?</button>
+            <button class="help-chip" data-help="what-is-this">What is this page?</button>
+            <button class="help-chip" data-help="need-help">I need help</button>
+        </div>
+        
+        <div class="helper-bot-input">
+            <button class="helper-voice-btn" id="helperVoiceBtn" title="Voice input">
+                <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke-width="2"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke-width="2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23" stroke-width="2"></line>
+                    <line x1="8" y1="23" x2="16" y2="23" stroke-width="2"></line>
+                </svg>
+                <svg class="stop-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: none;">
+                    <rect x="6" y="6" width="12" height="12" rx="2" stroke-width="2"></rect>
+                </svg>
+            </button>
+            <input type="text" id="helperBotInput" placeholder="Ask me anything..." />
+            <button id="helperBotSend" title="Send message">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="22" y1="2" x2="11" y2="13" stroke-width="2"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" stroke-width="2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
