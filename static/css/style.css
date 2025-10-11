@@ -6434,3 +6434,268 @@ a:focus-visible {
 .suggestion-chip:active {
     transform: translateY(0);
 }
+
+/* ============================================
+   RED SOS EMERGENCY BUTTON
+   ============================================ */
+
+.emergency-floating {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9998;
+}
+
+.sos-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff3b3b 0%, #d32f2f 100%);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    box-shadow: 
+        0 8px 24px rgba(255, 59, 59, 0.4),
+        0 4px 12px rgba(211, 47, 47, 0.3),
+        inset 0 -3px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    position: relative;
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+.sos-btn:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 
+        0 12px 36px rgba(255, 59, 59, 0.6),
+        0 6px 18px rgba(211, 47, 47, 0.4);
+    background: linear-gradient(135deg, #ff5252 0%, #e53935 100%);
+}
+
+.sos-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke: white;
+    fill: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    margin-bottom: -4px;
+}
+
+.sos-text {
+    font-size: 13px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    margin-top: -2px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.sos-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 59, 59, 0.6);
+    animation: pulse-ring 2s ease-out infinite;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+}
+
+@keyframes pulse-ring {
+    0% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.3); 
+        opacity: 0.5; 
+    }
+    100% { 
+        transform: scale(1.5); 
+        opacity: 0; 
+    }
+}
+
+@keyframes gentle-pulse {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.02); 
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .emergency-floating {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .sos-btn {
+        width: 65px;
+        height: 65px;
+    }
+    
+    .sos-text {
+        font-size: 12px;
+    }
+    
+    .sos-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* ========================================
+   TTS MUSIC PLAYER CONTROLS
+   ======================================== */
+
+.tts-player {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    color: white;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    min-width: 400px;
+    max-width: 600px;
+    z-index: 10000;
+    transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tts-player.active {
+    bottom: 24px;
+}
+
+.tts-player-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.tts-player-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.tts-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    animation: pulse-slow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+.tts-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.tts-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+}
+
+.tts-content {
+    font-size: 14px;
+    opacity: 0.85;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tts-controls {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.tts-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.tts-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.tts-btn:active {
+    transform: scale(0.95);
+}
+
+.tts-progress {
+    margin-top: 12px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.tts-progress-bar {
+    height: 100%;
+    background: white;
+    width: 0%;
+    animation: progress-animate 3s linear infinite;
+}
+
+@keyframes progress-animate {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+    .tts-player {
+        min-width: 90%;
+        max-width: 90%;
+        padding: 12px 16px;
+    }
+    
+    .tts-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .tts-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
