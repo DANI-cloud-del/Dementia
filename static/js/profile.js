@@ -216,8 +216,8 @@ if (upgradeBtn) {
         console.log('⬆️ Upgrade plan clicked');
         
         // Show upgrade options
-        const modal = createUpgradeModal();
-        document.body.appendChild(modal);
+        // const modal = createUpgradeModal(); # uncomment for the upgrade options to shoe
+        // document.body.appendChild(modal);
     });
 }
 
