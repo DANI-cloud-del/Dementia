@@ -6557,7 +6557,7 @@ a:focus-visible {
    TTS MUSIC PLAYER CONTROLS
    ======================================== */
 
-.tts-player {
+/* .tts-player {
     position: fixed;
     bottom: -100px;
     left: 50%;
@@ -6571,7 +6571,7 @@ a:focus-visible {
     max-width: 600px;
     z-index: 10000;
     transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+} */
 
 .tts-player.active {
     bottom: 24px;

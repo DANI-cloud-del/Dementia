@@ -1,7 +1,7 @@
 /**
- * ENHANCED TTS SYSTEM
- * - Prefers natural voices (Ava, Jenny, Samantha)
- * - Falls back to Microsoft Zira (female, better than David)
+ * ENHANCED TTS SYSTEM - WINDOWS OPTIMIZED
+ * - Prioritizes natural voices on all platforms
+ * - WINDOWS SPECIAL: Prefers Google UK English Female over robotic voices
  * - Includes playback controls
  */
 
@@ -13,18 +13,25 @@ class EnhancedTTS {
         this.selectedVoice = null;
         this.isSpeaking = false;
         this.isPaused = false;
+        this.isWindows = this.detectWindows();
         this.init();
+    }
+
+    detectWindows() {
+        const platform = navigator.platform.toLowerCase();
+        const userAgent = navigator.userAgent.toLowerCase();
+        return platform.includes('win') || userAgent.includes('windows');
     }
 
     async init() {
         return new Promise((resolve) => {
             const loadVoices = () => {
                 this.voices = speechSynthesis.getVoices();
-                
                 if (this.voices.length > 0) {
                     this.ready = true;
                     this.selectedVoice = this.selectBestVoice();
                     console.log('✅ TTS Ready');
+                    console.log('🪟 Platform:', this.isWindows ? 'Windows' : 'Other');
                     console.log('🎵 Selected voice:', this.selectedVoice?.name || 'Default');
                     this.logAvailableVoices();
                     resolve();
@@ -32,7 +39,10 @@ class EnhancedTTS {
             };
 
             loadVoices();
-
+            
+            // Load voices again after delay (Windows fix)
+            setTimeout(loadVoices, 100);
+            
             if (speechSynthesis.onvoiceschanged !== undefined) {
                 speechSynthesis.onvoiceschanged = loadVoices;
             }
@@ -40,75 +50,114 @@ class EnhancedTTS {
     }
 
     /**
-     * Smart voice selection with Zira fallback
+     * WINDOWS-OPTIMIZED voice selection
      * Priority:
-     * 1. Microsoft Ava/Jenny/Emma Online (Edge)
-     * 2. Samantha/Fiona (macOS)
-     * 3. Google Female voices
-     * 4. Microsoft Zira (Windows fallback - BETTER than David)
-     * 5. Any female voice
+     * 1. Microsoft Natural Online Voices (Edge - requires internet)
+     * 2. Google UK English Female (Chrome Windows - BEST fallback)
+     * 3. Other Google Female Voices
+     * 4. macOS Samantha/Fiona
+     * 5. Microsoft Zira (Windows fallback)
+     * 6. Any female voice (avoid robotic male)
      */
     selectBestVoice(lang = 'en') {
         if (!this.ready || this.voices.length === 0) {
             return null;
         }
 
-        // Priority 1: Microsoft Online voices (Edge)
-        const naturalVoices = [
-            /Microsoft.*Ava.*Online/i,
-            /Microsoft.*Jenny.*Online/i,
-            /Microsoft.*Emma.*Online/i,
-            /Microsoft.*Aria.*Online/i
+        console.log(`🔍 Searching for best voice from ${this.voices.length} voices`);
+
+        // PRIORITY 1: Microsoft Natural Online Voices (Edge - neural voices)
+        const microsoftNaturalPatterns = [
+            /Microsoft.*Jenny.*Online/i,    // Natural female (best)
+            /Microsoft.*Aria.*Online/i,     // Natural female
+            /Microsoft.*Michelle.*Online/i, // Natural female
+            /Microsoft.*Ava.*Online/i,      // Natural female
+            /Microsoft.*Emma.*Online/i      // Natural female
         ];
 
-        for (const pattern of naturalVoices) {
+        for (const pattern of microsoftNaturalPatterns) {
             const voice = this.voices.find(v => 
-                pattern.test(v.name) && v.lang.startsWith(lang)
+                pattern.test(v.name) && 
+                v.lang.startsWith(lang)
             );
             if (voice) {
-                console.log('✨ Found natural voice:', voice.name);
+                console.log('✨ Found Microsoft Natural voice:', voice.name);
                 return voice;
             }
         }
 
-        // Priority 2: macOS voices
+        // PRIORITY 2: Windows Special - Google UK English Female (better than robotic MS voices)
+        if (this.isWindows) {
+            const ukFemaleVoice = this.voices.find(v => 
+                /Google.*UK.*English.*Female/i.test(v.name) && 
+                v.lang.startsWith(lang)
+            );
+            if (ukFemaleVoice) {
+                console.log('🇬🇧 Found Google UK English Female (Windows preferred):', ukFemaleVoice.name);
+                return ukFemaleVoice;
+            }
+        }
+
+        // PRIORITY 3: Other Google Female Voices (better quality than MS robotic)
+        const googleFemalePatterns = [
+            /Google.*UK.*English.*Female/i,  // UK Female (non-Windows also good)
+            /Google.*US.*English/i,           // US English (usually good)
+            /Google.*Female/i                 // Any Google female
+        ];
+
+        for (const pattern of googleFemalePatterns) {
+            const voice = this.voices.find(v => 
+                pattern.test(v.name) && 
+                v.lang.startsWith(lang)
+            );
+            if (voice) {
+                console.log('🌐 Found Google voice:', voice.name);
+                return voice;
+            }
+        }
+
+        // PRIORITY 4: macOS voices (high quality)
         const macVoice = this.voices.find(v => 
-            (/Samantha|Fiona/i.test(v.name)) && v.lang.startsWith(lang)
+            /Samantha|Fiona|Victoria/i.test(v.name) && 
+            v.lang.startsWith(lang)
         );
         if (macVoice) {
             console.log('🍎 Found macOS voice:', macVoice.name);
             return macVoice;
         }
 
-        // Priority 3: Google Female voices
-        const googleFemale = this.voices.find(v => 
-            /Google.*Female|Google.*UK.*Female/i.test(v.name) && v.lang.startsWith(lang)
-        );
-        if (googleFemale) {
-            console.log('🌐 Found Google female voice:', googleFemale.name);
-            return googleFemale;
-        }
-
-        // Priority 4: Microsoft Zira (Windows Chrome fallback - FEMALE)
+        // PRIORITY 5: Microsoft Zira (Windows fallback - female, less robotic than David/Mark)
         const ziraVoice = this.voices.find(v => 
-            /Zira/i.test(v.name) && v.lang.startsWith(lang)
+            /Zira/i.test(v.name) && 
+            v.lang.startsWith(lang)
         );
         if (ziraVoice) {
-            console.log('💙 Found Microsoft Zira (Windows female):', ziraVoice.name);
+            console.log('💙 Found Microsoft Zira (fallback):', ziraVoice.name);
             return ziraVoice;
         }
 
-        // Priority 5: Any female voice
+        // PRIORITY 6: Any female voice (avoid male robotic voices)
         const anyFemale = this.voices.find(v => 
-            /female/i.test(v.name) && v.lang.startsWith(lang)
+            /female/i.test(v.name) && 
+            v.lang.startsWith(lang)
         );
         if (anyFemale) {
             console.log('👤 Found female voice:', anyFemale.name);
             return anyFemale;
         }
 
-        // Final fallback: first available voice
-        console.log('⚠️ Using default voice');
+        // FALLBACK: Explicitly avoid robotic male voices (David, Mark, etc.)
+        const fallbackVoice = this.voices.find(v => 
+            v.lang.startsWith(lang) && 
+            !/David|Mark|James|George/i.test(v.name)
+        );
+        if (fallbackVoice) {
+            console.log('⚠️ Using fallback voice:', fallbackVoice.name);
+            return fallbackVoice;
+        }
+
+        // Last resort
+        console.log('⚠️ Using default voice (may be robotic)');
         return this.voices.find(v => v.lang.startsWith(lang)) || this.voices[0];
     }
 
@@ -126,14 +175,15 @@ class EnhancedTTS {
             this.stop();
 
             const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Use selected voice
+
+            // Use selected voice or re-select best voice
             const voice = this.selectedVoice || this.selectBestVoice(options.lang || 'en');
             if (voice) {
                 utterance.voice = voice;
+                console.log('🎵 Using voice:', voice.name);
             }
 
-            // Natural speech parameters
+            // Natural speech parameters (adjusted for better quality)
             utterance.rate = options.rate || 0.9;
             utterance.pitch = options.pitch || 1.0;
             utterance.volume = options.volume || 1.0;
@@ -166,7 +216,6 @@ class EnhancedTTS {
 
             this.currentUtterance = utterance;
             speechSynthesis.speak(utterance);
-            console.log('🎵 Speaking with', voice?.name || 'default voice');
         });
     }
 
@@ -196,107 +245,123 @@ class EnhancedTTS {
         }
     }
 
-    /**
-     * Show music player-style controls
-     */
     showPlayerControls(text) {
         let player = document.getElementById('tts-player');
-        
         if (!player) {
             player = document.createElement('div');
             player.id = 'tts-player';
             player.className = 'tts-player';
-            player.innerHTML = `
-                <div class="tts-player-content">
-                    <div class="tts-player-info">
-                        <div class="tts-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18V5l12-2v13"></path>
-                                <circle cx="6" cy="18" r="3"></circle>
-                                <circle cx="18" cy="16" r="3"></circle>
-                            </svg>
-                        </div>
-                        <div class="tts-text">
-                            <span class="tts-label">AI is speaking...</span>
-                            <span class="tts-content">${this.truncateText(text, 50)}</span>
-                        </div>
-                    </div>
-                    <div class="tts-controls">
-                        <button class="tts-btn tts-pause" onclick="window.enhancedTTS.pause()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <rect x="6" y="4" width="4" height="16"></rect>
-                                <rect x="14" y="4" width="4" height="16"></rect>
-                            </svg>
-                        </button>
-                        <button class="tts-btn tts-resume" style="display: none;" onclick="window.enhancedTTS.resume()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                        </button>
-                        <button class="tts-btn tts-stop" onclick="window.enhancedTTS.stop()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <rect x="5" y="5" width="14" height="14"></rect>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="tts-progress">
-                    <div class="tts-progress-bar"></div>
-                </div>
-            `;
             document.body.appendChild(player);
-        } else {
-            const textEl = player.querySelector('.tts-content');
-            if (textEl) textEl.textContent = this.truncateText(text, 50);
         }
 
-        // Show with animation
-        setTimeout(() => player.classList.add('active'), 10);
+        const voiceName = this.selectedVoice?.name || 'Default Voice';
+        const displayText = text.substring(0, 50) + (text.length > 50 ? '...' : '');
+
+        player.innerHTML = `
+            <div class="tts-player-content">
+                <div class="tts-player-info">
+                    <span class="tts-voice-badge">${voiceName}</span>
+                    <span class="tts-text">${displayText}</span>
+                </div>
+                <div class="tts-player-controls">
+                    <button onclick="window.enhancedTTS.pause()" class="tts-control-btn" id="pauseBtn">
+                        ⏸ Pause
+                    </button>
+                    <button onclick="window.enhancedTTS.resume()" class="tts-control-btn" id="resumeBtn" style="display:none;">
+                        ▶️ Resume
+                    </button>
+                    <button onclick="window.enhancedTTS.stop()" class="tts-control-btn">
+                        ⏹ Stop
+                    </button>
+                </div>
+            </div>
+        `;
+
+        player.style.display = 'flex';
+    }
+
+    updatePlayerControls() {
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        
+        if (pauseBtn && resumeBtn) {
+            if (this.isPaused) {
+                pauseBtn.style.display = 'none';
+                resumeBtn.style.display = 'inline-block';
+            } else {
+                pauseBtn.style.display = 'inline-block';
+                resumeBtn.style.display = 'none';
+            }
+        }
     }
 
     hidePlayerControls() {
         const player = document.getElementById('tts-player');
         if (player) {
-            player.classList.remove('active');
-            setTimeout(() => player.remove(), 300);
+            player.style.display = 'none';
         }
-    }
-
-    updatePlayerControls() {
-        const pauseBtn = document.querySelector('.tts-pause');
-        const resumeBtn = document.querySelector('.tts-resume');
-        
-        if (this.isPaused) {
-            if (pauseBtn) pauseBtn.style.display = 'none';
-            if (resumeBtn) resumeBtn.style.display = 'flex';
-        } else {
-            if (pauseBtn) pauseBtn.style.display = 'flex';
-            if (resumeBtn) resumeBtn.style.display = 'none';
-        }
-    }
-
-    truncateText(text, maxLength) {
-        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
     }
 
     logAvailableVoices() {
-        console.group('🎤 Available Voices:');
-        const naturalVoices = this.voices.filter(v => /Ava|Jenny|Emma|Samantha|Fiona/i.test(v.name));
-        const ziraVoice = this.voices.filter(v => /Zira/i.test(v.name));
-        const googleVoices = this.voices.filter(v => v.name.includes('Google'));
+        console.log('📋 Available voices:');
+        this.voices.forEach((voice, index) => {
+            const isSelected = voice === this.selectedVoice ? '✅' : '  ';
+            const isPriority = this.isWindows && /Google.*UK.*English.*Female/i.test(voice.name) ? '⭐' : '';
+            console.log(`${isSelected}${isPriority} ${index}: ${voice.name} (${voice.lang})`);
+        });
         
-        if (naturalVoices.length > 0) {
-            console.log('✨ Natural Voices:', naturalVoices.map(v => v.name));
+        if (this.isWindows) {
+            const hasUKFemale = this.voices.some(v => /Google.*UK.*English.*Female/i.test(v.name));
+            if (!hasUKFemale) {
+                console.warn('⚠️ Google UK English Female not found - you may get robotic voice');
+                console.log('💡 Try using Google Chrome for better voice quality on Windows');
+            }
         }
-        if (ziraVoice.length > 0) {
-            console.log('💙 Microsoft Zira:', ziraVoice.map(v => v.name));
+    }
+
+    // Force refresh voices (useful for Windows)
+    async refreshVoices() {
+        console.log('🔄 Refreshing voice list...');
+        this.ready = false;
+        await this.init();
+    }
+
+    // Get voice quality info
+    getVoiceQuality() {
+        if (!this.selectedVoice) return 'Unknown';
+        
+        const voiceName = this.selectedVoice.name;
+        
+        if (/Microsoft.*(Jenny|Aria|Michelle|Ava|Emma).*Online/i.test(voiceName)) {
+            return 'Excellent (Natural)';
         }
-        if (googleVoices.length > 0) {
-            console.log('🌐 Google Voices:', googleVoices.map(v => v.name));
+        if (/Google.*UK.*English.*Female/i.test(voiceName)) {
+            return 'Good (Google Female)';
         }
-        console.groupEnd();
+        if (/Samantha|Fiona/i.test(voiceName)) {
+            return 'Excellent (macOS)';
+        }
+        if (/Google/i.test(voiceName)) {
+            return 'Good (Google)';
+        }
+        if (/Zira/i.test(voiceName)) {
+            return 'Fair (Basic Female)';
+        }
+        if (/David|Mark/i.test(voiceName)) {
+            return 'Poor (Robotic Male)';
+        }
+        
+        return 'Variable';
     }
 }
 
-// Global instance
+// Initialize and expose globally
 window.enhancedTTS = new EnhancedTTS();
+
+// Force voice refresh after 1 second (Windows fix)
+setTimeout(() => {
+    if (window.enhancedTTS) {
+        window.enhancedTTS.refreshVoices();
+        console.log('🎤 Voice quality:', window.enhancedTTS.getVoiceQuality());
+    }
+}, 1000);
