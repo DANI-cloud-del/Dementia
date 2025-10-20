@@ -498,7 +498,7 @@
         }
         
         setTimeout(() => {
-            const greeting = "Hello! I'm your Silent Guardian. I'm here to listen to you. How are you feeling today?";
+            const greeting = "Hello! I'm your AI Companion. I'm here to listen to you. How are you feeling today?";
             addMessage(greeting, 'ai');
             speak(greeting);
         }, 1000);

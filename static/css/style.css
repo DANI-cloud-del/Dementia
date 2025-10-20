@@ -8719,3 +8719,582 @@ a:focus-visible {
 .detection-section .activity-card[data-activity="clock"]:hover:before {
     transform: scaleX(1);
 }
+
+/* ============================================
+   SMART AI GUIDE - Transparent & Teal Theme
+   ============================================ */
+
+/* Minimal Overlay (barely visible when speaking) */
+.ai-guide-overlay-minimal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.ai-guide-overlay-minimal.subtle-active {
+    opacity: 1;
+}
+
+.ai-guide-overlay-minimal.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Transparent Horizontal Container - Teal Theme */
+.ai-guide-container-transparent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: rgba(23, 162, 184, 0.92); /* Teal with transparency */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -4px 20px rgba(23, 162, 184, 0.4);
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0 2rem;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.ai-guide-container-transparent.minimized {
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Compact Avatar */
+.ai-avatar-compact {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.avatar-circle {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.avatar-circle:hover {
+    transform: scale(1.08);
+}
+
+.avatar-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.avatar-circle.speaking .avatar-svg {
+    animation: speaking-bounce 0.5s ease-in-out infinite;
+}
+
+.avatar-circle.listening .avatar-svg {
+    animation: listening-pulse 1.2s ease-in-out infinite;
+}
+
+.avatar-circle.thinking .avatar-svg {
+    animation: thinking-spin 2s linear infinite;
+}
+
+@keyframes speaking-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes listening-pulse {
+    0%, 100% { filter: drop-shadow(0 2px 8px rgba(46, 204, 113, 0.6)); }
+    50% { filter: drop-shadow(0 4px 16px rgba(46, 204, 113, 1)); }
+}
+
+@keyframes thinking-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.status-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(23, 162, 184, 0.8);
+    transition: all 0.3s ease;
+}
+
+.status-dot.speaking {
+    background: #e74c3c;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.8);
+}
+
+.status-dot.listening {
+    background: #2ecc71;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.8);
+}
+
+.status-dot.thinking {
+    background: #f39c12;
+    box-shadow: 0 0 8px rgba(243, 156, 18, 0.8);
+}
+
+.guide-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Message Display - Single Line */
+.message-display-compact {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.current-message {
+    color: white;
+    font-size: 1rem;
+    line-height: 1.4;
+    padding: 0.5rem 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    animation: message-fade-in 0.3s ease-out;
+}
+
+.current-message.user-speaking {
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
+}
+
+@keyframes message-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input Controls */
+.input-controls-compact {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.guide-text-input-transparent {
+    width: 280px;
+    padding: 0.7rem 1.2rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    color: white;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.guide-text-input-transparent::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.guide-text-input-transparent:focus {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* Voice Button - Prominent & Visible */
+.voice-btn-prominent {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.voice-btn-prominent:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.voice-btn-prominent.listening-active {
+    background: rgba(46, 204, 113, 0.95);
+    border-color: rgba(46, 204, 113, 1);
+    animation: listening-btn-pulse 1s ease-in-out infinite;
+}
+
+@keyframes listening-btn-pulse {
+    0%, 100% { box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4); }
+    50% { box-shadow: 0 8px 24px rgba(46, 204, 113, 0.8); }
+}
+
+.mic-svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Send Button */
+.send-btn-compact {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.send-btn-compact:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+.send-svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Minimize Button */
+.minimize-btn-compact {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.minimize-btn-compact:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.minimize-svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Listening Indicator - Clearly Visible */
+.listening-indicator-visible {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(46, 204, 113, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 0.75rem 1.5rem;
+    border-radius: 24px;
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 10000;
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.listening-waves {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.wave {
+    width: 4px;
+    height: 18px;
+    background: white;
+    border-radius: 2px;
+    animation: wave-motion 1s ease-in-out infinite;
+}
+
+.wave:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.wave:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes wave-motion {
+    0%, 100% { height: 14px; }
+    50% { height: 26px; }
+}
+
+.listening-label {
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ai-guide-container-transparent {
+        padding: 0 1rem;
+        height: 70px;
+        gap: 0.75rem;
+    }
+    
+    .guide-text-input-transparent {
+        width: 160px;
+    }
+    
+    .voice-btn-prominent {
+        width: 46px;
+        height: 46px;
+    }
+    
+    .guide-label {
+        display: none;
+    }
+}
+
+/* ============================================
+   MOBILE RESPONSIVE FIXES FOR AI GUIDE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .ai-guide-container-transparent {
+        height: auto;
+        min-height: 70px;
+        max-height: 160px;
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+    
+    .ai-guide-container-transparent.active {
+        max-height: 200px;
+    }
+    
+    /* Avatar section - smaller on mobile */
+    .ai-avatar-compact {
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 50px;
+    }
+    
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .guide-label {
+        font-size: 0.75rem;
+        display: none; /* Hide label on very small screens */
+    }
+    
+    /* Message display - allow wrapping */
+    .message-display-compact {
+        flex: 1;
+        min-width: 0; /* Allow flex shrinking */
+    }
+    
+    .current-message {
+        font-size: 0.85rem;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* Limit to 3 lines on mobile */
+        -webkit-box-orient: vertical;
+    }
+    
+    /* Input controls - more compact */
+    .input-controls-compact {
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .guide-text-input-transparent {
+        width: 140px;
+        min-width: 100px;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Voice button - ensure visibility */
+    .voice-btn-prominent {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+    }
+    
+    .mic-svg {
+        width: 22px;
+        height: 22px;
+    }
+    
+    /* Send button - slightly smaller */
+    .send-btn-compact {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .send-svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    /* Minimize button */
+    .minimize-btn-compact {
+        width: 32px;
+        height: 32px;
+    }
+    
+    /* Listening indicator - position adjustment */
+    .listening-indicator-visible {
+        bottom: 90px;
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .listening-label {
+        font-size: 0.85rem;
+    }
+    
+    /* Overlay - less intrusive on mobile */
+    .ai-guide-overlay-minimal.subtle-active {
+        opacity: 0.5;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .ai-guide-container-transparent {
+        padding: 0.5rem 0.75rem;
+        gap: 0.4rem;
+    }
+    
+    .guide-text-input-transparent {
+        width: 100px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .voice-btn-prominent {
+        width: 42px;
+        height: 42px;
+    }
+    
+    .current-message {
+        font-size: 0.8rem;
+        line-clamp: 2; /* Standard property for compatibility */
+        -webkit-line-clamp: 2; /* Limit to 2 lines on very small screens */
+    }
+    
+    /* Hide send button on very small screens if needed */
+    .send-btn-compact {
+        width: 34px;
+        height: 34px;
+    }
+}
+
+/* Landscape mobile fix */
+@media (max-width: 900px) and (max-height: 500px) {
+    .ai-guide-container-transparent {
+        height: 60px;
+        min-height: 60px;
+    }
+    
+    .ai-guide-container-transparent.active {
+        height: 120px;
+        max-height: 120px;
+    }
+    
+    .current-message {
+        -webkit-line-clamp: 2;
+    }
+}
+
+/* Toggle FAB Button */
+.ai-guide-toggle-fab {
+    position: fixed;
+    bottom: 90px; /* Above SOS button */
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(23, 162, 184, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    z-index: 9997;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.ai-guide-toggle-fab:hover {
+    background: rgba(23, 162, 184, 1);
+    transform: scale(1.05);
+}
+
+.ai-guide-toggle-fab .toggle-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.ai-guide-toggle-fab .toggle-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .ai-guide-toggle-fab {
+        width: 50px;
+        height: 50px;
+        bottom: 80px;
+        left: 15px;
+    }
+    
+    .ai-guide-toggle-fab .toggle-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .ai-guide-toggle-fab .toggle-text {
+        font-size: 0.65rem;
+    }
+}

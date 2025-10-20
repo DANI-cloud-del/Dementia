@@ -493,6 +493,171 @@ def voice_to_text():
         'confidence': 0.95
     })
 
+@app.route('/api/smart-guide', methods=['POST'])
+def smart_guide():
+    """Intelligent navigation guide with flexible keyword matching"""
+    try:
+        data = request.json
+        user_text = data.get('text', '').lower()
+        current_page = data.get('currentPage', 'home')
+        current_activity = data.get('currentActivity')
+        site_map = data.get('siteMap', {})
+        
+        # Build concise context with clearer instructions
+        context = f"""You are a helpful navigation guide for Silent Guardian app.
+
+Current location: {current_page}
+Current activity: {current_activity or 'None'}
+
+Pages you can navigate to:
+- Home (/) - Welcome/main page
+- Dashboard (/dashboard) - Personal overview
+- Cognitive Activities (/detection) - Games and exercises
+- AI Companion (/companion) - Voice chat
+- LifeVault (/lifevault) - Document storage
+- Emergency (/emergency) - Emergency help (also called SOS)
+- Profile (/profile) - Personal settings
+
+CRITICAL Rules:
+- ALWAYS state what you're doing clearly
+- For navigation: Say "Taking you to [page name]" or "Opening [page name]"
+- For activities: Say "Starting [activity name]"
+- Be VERY concise (5-10 words max)
+- NO EMOJIS
+- NO repetition
+- Use simple, direct language
+
+Response Templates:
+Navigation requests:
+- "Taking you to the home page."
+- "Opening your dashboard."
+- "Navigating to LifeVault."
+- "Going to the emergency page."
+- "Opening your profile."
+
+Activity requests:
+- "Starting memory games."
+- "Opening story telling activity."
+- "Starting the drawing activity."
+
+General help:
+- "I can help you navigate to any page."
+- "Which page would you like to visit?"
+
+Examples:
+User: "Take me to home page"
+You: "Taking you to the home page."
+
+User: "Open lifevault"
+You: "Opening LifeVault."
+
+User: "I need help" or "SOS"
+You: "Taking you to the emergency page."
+
+User: "What can you do?"
+You: "I help you navigate to different pages and start activities."
+
+User: "Start memory games"
+You: "Starting memory games."
+
+User message: {user_text}"""
+
+        chat_completion = groq_client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": context},
+                {"role": "user", "content": user_text}
+            ],
+            model="llama-3.3-70b-versatile",
+            temperature=0.5,
+            max_tokens=50
+        )
+        
+        response_text = chat_completion.choices[0].message.content
+        action = None
+        
+        # Enhanced Navigation Detection with Multiple Keywords
+        
+        # HOME PAGE - multiple variations
+        home_keywords = ['home', 'homepage', 'main page', 'welcome page', 'start page', 'beginning']
+        if any(keyword in user_text for keyword in home_keywords):
+            # Make sure it's not asking about other pages
+            if not any(word in user_text for word in ['dashboard', 'profile', 'emergency', 'vault', 'companion', 'detection', 'activity']):
+                action = {'type': 'navigate', 'url': '/'}
+        
+        # DASHBOARD
+        dashboard_keywords = ['dashboard', 'dash board', 'main dashboard']
+        if any(keyword in user_text for keyword in dashboard_keywords):
+            action = {'type': 'navigate', 'url': '/dashboard'}
+        
+        # COMPANION
+        companion_keywords = ['companion', 'ai companion', 'talk to ai', 'voice chat', 'chat with ai', 'speak with ai']
+        if any(keyword in user_text for keyword in companion_keywords):
+            action = {'type': 'navigate', 'url': '/companion'}
+        
+        # LIFEVAULT - multiple variations
+        lifevault_keywords = ['lifevault', 'life vault', 'vault', 'document', 'documents', 'storage', 'file', 'files', 'my documents']
+        if any(keyword in user_text for keyword in lifevault_keywords):
+            action = {'type': 'navigate', 'url': '/lifevault'}
+        
+        # EMERGENCY - multiple variations including SOS
+        emergency_keywords = ['emergency', 'sos', 's.o.s', 'help', 'urgent', 'emergency page', 'sos page', 'need help']
+        if any(keyword in user_text for keyword in emergency_keywords):
+            # Make sure it's navigation request
+            if any(word in user_text for word in ['page', 'go', 'take', 'open', 'show', 'need', 'sos', 'emergency', 'urgent']):
+                action = {'type': 'navigate', 'url': '/emergency'}
+        
+        # PROFILE
+        profile_keywords = ['profile', 'my profile', 'settings', 'account', 'personal settings', 'my account']
+        if any(keyword in user_text for keyword in profile_keywords):
+            action = {'type': 'navigate', 'url': '/profile'}
+        
+        # DETECTION/ACTIVITIES
+        detection_keywords = ['activity', 'activities', 'cognitive', 'detection', 'exercise', 'exercises', 'brain games']
+        if any(keyword in user_text for keyword in detection_keywords):
+            if current_page != 'detection':
+                action = {'type': 'navigate', 'url': '/detection'}
+        
+        # Activity-specific detection (if on detection page or mentioning specific activities)
+        if current_page == 'detection' or any(word in user_text for word in ['game', 'story', 'draw', 'picture', 'conversation']):
+            
+            # MEMORY GAMES
+            game_keywords = ['memory', 'game', 'games', 'matching', 'pattern', 'sequence', 'recall', 'memory game']
+            if any(keyword in user_text for keyword in game_keywords):
+                action = {'type': 'start_activity', 'activity': 'games'}
+            
+            # STORY TELLING
+            story_keywords = ['story', 'stories', 'tell', 'narrative', 'storytelling']
+            if any(keyword in user_text for keyword in story_keywords) and 'game' not in user_text:
+                action = {'type': 'start_activity', 'activity': 'story'}
+            
+            # CLOCK DRAWING
+            clock_keywords = ['draw', 'drawing', 'clock', 'clock drawing', 'sketch']
+            if any(keyword in user_text for keyword in clock_keywords):
+                action = {'type': 'start_activity', 'activity': 'clock'}
+            
+            # PICTURE DESCRIPTION
+            picture_keywords = ['picture', 'image', 'photo', 'describe', 'picture description']
+            if any(keyword in user_text for keyword in picture_keywords):
+                action = {'type': 'start_activity', 'activity': 'image'}
+            
+            # CONVERSATION
+            conversation_keywords = ['conversation', 'talk', 'chat', 'discuss', 'guided conversation']
+            if any(keyword in user_text for keyword in conversation_keywords) and 'ai' not in user_text:
+                action = {'type': 'start_activity', 'activity': 'conversation'}
+        
+        return jsonify({
+            'response': response_text,
+            'action': action
+        })
+        
+    except Exception as e:
+        print(f"Guide error: {str(e)}")
+        return jsonify({
+            'response': "I help you navigate to different pages and start activities. Where would you like to go?"
+        })
+
+
+
 
 # ============================================
 # WEB ROUTES

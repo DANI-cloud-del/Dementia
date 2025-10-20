@@ -66,6 +66,58 @@ if (backToSelection) {
     });
 }
 
+// Initialize activity-specific interactions
+function initActivityInteractions(type) {
+    console.log('Initializing interactions for:', type);
+    
+    // Activity-specific initialization
+    switch(type) {
+        case 'games':
+            // Memory games are initialized within their own functions
+            console.log('Memory games ready');
+            break;
+            
+        case 'clock':
+            // Initialize clock drawing canvas
+            setTimeout(() => {
+                const canvas = document.getElementById('clockCanvas');
+                if (canvas) {
+                    initClockCanvas();
+                }
+            }, 100);
+            break;
+            
+        case 'image':
+            // Initialize image description features
+            setTimeout(() => {
+                const textarea = document.getElementById('imageDescription');
+                if (textarea) {
+                    textarea.addEventListener('input', updateCharCount);
+                }
+            }, 100);
+            break;
+            
+        case 'story':
+            // Story mode is handled by overlay functions
+            console.log('Story mode ready');
+            break;
+            
+        case 'conversation':
+            // Conversation is handled by overlay functions
+            console.log('Conversation mode ready');
+            break;
+    }
+    
+    // Notify AI Guide if available
+    if (window.smartGuide) {
+        window.smartGuide.currentActivity = type;
+        window.smartGuide.detectActivities();
+    }
+}
+
+// Make startActivity globally accessible for AI guide
+window.startActivity = startActivity;
+
 // ============================================
 // MEMORY GAMES CONTENT - ENHANCED
 // ============================================
@@ -661,6 +713,12 @@ function backToGameSelection() {
     if (cardGame.timer) clearInterval(cardGame.timer);
 }
 
+function onMemoryGameComplete(score, total) {
+    if (window.aiOrb) {
+        window.aiOrb.memoryGameFeedback(score, total);
+    }
+}
+
 // ============================================
 // OTHER ACTIVITIES (Keep existing)
 // ============================================
@@ -775,7 +833,7 @@ function initSpeechRecognition() {
                     textarea.value += finalTranscript;
                     updateCharCount();
                 }
-                document.getElementById('voiceStatus').textContent = interimTranscript ? `🎤 ${interimTranscript}` : '🎤 Listening...';
+                document.getElementById('voiceStatus').textContent = interimTranscript ? ` ${interimTranscript}` : ' Listening...';
             }
         };
 
@@ -968,6 +1026,11 @@ function startVoiceRecording() {
     // Implement actual voice recording with Web Speech API
 }
 
+function startPictureDescription(imageUrl) {
+    if (window.aiOrb) {
+        window.aiOrb.pictureDescriptionGuide(imageUrl);
+    }
+}
 
 function generateStoryContent() {
     return `
@@ -1340,6 +1403,11 @@ function submitStory() {
     sendStoryMessage();
 }
 
+function startStoryTelling() {
+    if (window.aiOrb) {
+        window.aiOrb.storyGuide();
+    }
+}
 
 function generateConversationContent() {
     return `
@@ -2138,3 +2206,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
 });
+
+function startClockDrawing() {
+    if (window.aiOrb) {
+        window.aiOrb.clockDrawingGuide();
+    }
+}
