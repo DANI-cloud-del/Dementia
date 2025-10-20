@@ -22,7 +22,7 @@ class WindowsVoiceHelper {
 
         const voices = speechSynthesis.getVoices();
         const hasNaturalVoice = voices.some(v => 
-            /Microsoft.*(Jenny|Aria|Michelle|Ava).*Online/i.test(v.name)
+            /Microsoft.*(Ava|Aria|Michelle|Jenny).*Online/i.test(v.name)
         );
 
         if (!hasNaturalVoice) {

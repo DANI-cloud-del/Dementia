@@ -251,47 +251,56 @@
 
     // Add Message to Conversation
     function addMessage(text, sender) {
-        const conversationDisplay = document.getElementById('conversationDisplay');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}-message`;
-        
-        const currentTime = new Date().toLocaleTimeString([], { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
-        let avatarSVG = '';
-        if (sender === 'ai') {
-            avatarSVG = `<svg class="message-avatar" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
-            </svg>`;
-        } else {
-            avatarSVG = `<svg class="message-avatar" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>`;
-        }
-        
-        messageDiv.innerHTML = `
-            ${avatarSVG}
-            <div class="message-bubble">
-                <p>${text}</p>
-                <span class="message-time">${currentTime}</span>
-            </div>
-        `;
-        
-        conversationDisplay.appendChild(messageDiv);
-        conversationDisplay.scrollTop = conversationDisplay.scrollHeight;
-        
-        conversationHistory.push({
-            sender,
-            text,
-            timestamp: new Date()
-        });
-        
-        console.log('📝 Message added to conversation');
+    const conversationDisplay = document.getElementById('conversationDisplay');
+    
+    // NULL CHECK - prevent error
+    if (!conversationDisplay) {
+        console.error('❌ conversationDisplay element not found!');
+        return;
     }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const currentTime = new Date().toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    
+    let avatarSVG = '';
+    if (sender === 'ai') {
+        avatarSVG = `<svg class="message-avatar" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+            <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+            <path d="M9 15c1 1 2.5 1.5 3 1.5s2-0.5 3-1.5"/>
+        </svg>`;
+    } else {
+        avatarSVG = `<svg class="message-avatar" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3-6 8-6s8 2 8 6"/>
+        </svg>`;
+    }
+    
+    messageDiv.innerHTML = `
+        ${avatarSVG}
+        <div class="message-content">
+            <div class="message-text">${text}</div>
+            <div class="message-time">${currentTime}</div>
+        </div>
+    `;
+    
+    conversationDisplay.appendChild(messageDiv);
+    conversationDisplay.scrollTop = conversationDisplay.scrollHeight;
+    
+    conversationHistory.push({
+        sender,
+        text,
+        timestamp: new Date()
+    });
+    
+    console.log('📝 Message added to conversation');
+}
 
     // Send to AI Backend
     async function sendToAI(message) {

@@ -496,16 +496,73 @@ function hideHelperTyping() {
     if (typing) typing.remove();
 }
 
-function speakHelperResponse(text) {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;
-        utterance.pitch = 1.0;
-        utterance.volume = 0.8;
-        
-        window.speechSynthesis.speak(utterance);
+async function speakHelperResponse(text) {
+    if (!text || text.trim().length === 0) {
+        console.warn('⚠️ No text to speak');
+        return;
+    }
+    
+    console.log('🔊 Helper Bot Speaking:', text);
+    
+    try {
+        // Use Enhanced TTS System (should already be loaded)
+        if (window.enhancedTTS && window.enhancedTTS.ready) {
+            console.log('✨ Using Enhanced TTS for helper bot');
+            await window.enhancedTTS.speak(text, {
+                rate: 0.9,
+                pitch: 1.0,
+                volume: 0.8,
+                lang: 'en-US'
+            });
+        } 
+        // Fallback to basic speechSynthesis
+        else if ('speechSynthesis' in window) {
+            console.log('⚠️ Enhanced TTS not ready, using basic TTS');
+            
+            // Wait a bit for voices to load
+            const voices = speechSynthesis.getVoices();
+            if (voices.length === 0) {
+                // Wait for voices to load
+                await new Promise(resolve => {
+                    if (speechSynthesis.onvoiceschanged !== undefined) {
+                        speechSynthesis.onvoiceschanged = () => resolve();
+                    }
+                    setTimeout(resolve, 500);
+                });
+            }
+            
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 0.8;
+            utterance.lang = 'en-US';
+            
+            // Try to use a good voice
+            const availableVoices = speechSynthesis.getVoices();
+            const goodVoice = availableVoices.find(v => 
+                /Google.*UK.*English.*Female|Microsoft.*Jenny|Samantha/i.test(v.name)
+            );
+            if (goodVoice) {
+                utterance.voice = goodVoice;
+                console.log('🎤 Using voice:', goodVoice.name);
+            }
+            
+            window.speechSynthesis.speak(utterance);
+            
+            // Wait for speech to complete
+            await new Promise((resolve) => {
+                utterance.onend = resolve;
+                utterance.onerror = resolve;
+                // Timeout after 30 seconds
+                setTimeout(resolve, 30000);
+            });
+        } else {
+            console.error('❌ No TTS available');
+        }
+    } catch (error) {
+        console.error('❌ Helper Bot TTS Error:', error);
     }
 }
 

@@ -67,11 +67,11 @@ class EnhancedTTS {
         console.log(`🔍 Searching for best voice from ${this.voices.length} voices`);
 
         // PRIORITY 1: Microsoft Natural Online Voices (Edge - neural voices)
-        const microsoftNaturalPatterns = [
+        const microsoftNaturalPatterns = [ 
+            /Microsoft.*Ava.*Online/i,      // Natural female
             /Microsoft.*Jenny.*Online/i,    // Natural female (best)
             /Microsoft.*Aria.*Online/i,     // Natural female
             /Microsoft.*Michelle.*Online/i, // Natural female
-            /Microsoft.*Ava.*Online/i,      // Natural female
             /Microsoft.*Emma.*Online/i      // Natural female
         ];
 
@@ -331,8 +331,8 @@ class EnhancedTTS {
         if (!this.selectedVoice) return 'Unknown';
         
         const voiceName = this.selectedVoice.name;
-        
-        if (/Microsoft.*(Jenny|Aria|Michelle|Ava|Emma).*Online/i.test(voiceName)) {
+
+        if (/Microsoft.*(Ava|Aria|Michelle|Jenny).*Online/i.test(voiceName)) {
             return 'Excellent (Natural)';
         }
         if (/Google.*UK.*English.*Female/i.test(voiceName)) {
