@@ -73,22 +73,37 @@ function initActivityInteractions(type) {
     // Activity-specific initialization
     switch(type) {
         case 'games':
-            // Memory games are initialized within their own functions
             console.log('Memory games ready');
             break;
             
         case 'clock':
-            // Initialize clock drawing canvas
-            setTimeout(() => {
+            // Initialize clock drawing canvas with retry
+            console.log('Initializing clock canvas...');
+            let retryCount = 0;
+            const maxRetries = 5;
+            
+            const initWithRetry = () => {
                 const canvas = document.getElementById('clockCanvas');
                 if (canvas) {
-                    initClockCanvas();
+                    const success = initClockCanvas();
+                    if (success) {
+                        console.log('✅ Clock canvas initialized');
+                    } else {
+                        console.error('❌ Failed to initialize clock canvas');
+                    }
+                } else if (retryCount < maxRetries) {
+                    retryCount++;
+                    console.log(`⏳ Retrying canvas init (${retryCount}/${maxRetries})...`);
+                    setTimeout(initWithRetry, 200);
+                } else {
+                    console.error('❌ Clock canvas not found after retries');
                 }
-            }, 100);
+            };
+            
+            setTimeout(initWithRetry, 100);
             break;
             
         case 'image':
-            // Initialize image description features
             setTimeout(() => {
                 const textarea = document.getElementById('imageDescription');
                 if (textarea) {
@@ -98,12 +113,10 @@ function initActivityInteractions(type) {
             break;
             
         case 'story':
-            // Story mode is handled by overlay functions
             console.log('Story mode ready');
             break;
             
         case 'conversation':
-            // Conversation is handled by overlay functions
             console.log('Conversation mode ready');
             break;
     }
@@ -114,9 +127,6 @@ function initActivityInteractions(type) {
         window.smartGuide.detectActivities();
     }
 }
-
-// Make startActivity globally accessible for AI guide
-window.startActivity = startActivity;
 
 // ============================================
 // MEMORY GAMES CONTENT - ENHANCED
@@ -1903,10 +1913,14 @@ let clockStartTime = null;
 let clockTimerInterval = null;
 let clockDrawingData = [];
 
-// Initialize canvas
+// Initialize canvas - IMPROVED
 function initClockCanvas() {
     clockCanvas = document.getElementById('clockCanvas');
-    if (!clockCanvas) return;
+    
+    if (!clockCanvas) {
+        console.error('❌ Clock canvas not found!');
+        return false;
+    }
     
     clockCtx = clockCanvas.getContext('2d');
     
@@ -1919,6 +1933,15 @@ function initClockCanvas() {
     // Fill with white background
     clockCtx.fillStyle = '#FFFFFF';
     clockCtx.fillRect(0, 0, clockCanvas.width, clockCanvas.height);
+    
+    // Remove any existing listeners first
+    clockCanvas.onmousedown = null;
+    clockCanvas.onmousemove = null;
+    clockCanvas.onmouseup = null;
+    clockCanvas.onmouseleave = null;
+    clockCanvas.ontouchstart = null;
+    clockCanvas.ontouchmove = null;
+    clockCanvas.ontouchend = null;
     
     // Add event listeners
     clockCanvas.addEventListener('mousedown', startClockDrawing);
@@ -1933,6 +1956,98 @@ function initClockCanvas() {
     
     // Start timer
     startClockTimer();
+    
+    console.log('✅ Clock canvas initialized successfully');
+    return true;
+}
+
+// Get coordinates helper function
+function getClockCanvasCoords(e) {
+    const rect = clockCanvas.getBoundingClientRect();
+    return {
+        x: (e.clientX - rect.left) * (clockCanvas.width / rect.width),
+        y: (e.clientY - rect.top) * (clockCanvas.height / rect.height)
+    };
+}
+
+// Drawing functions
+function startClockDrawing(e) {
+    isClockDrawing = true;
+    const coords = getClockCanvasCoords(e);
+    clockCtx.beginPath();
+    clockCtx.moveTo(coords.x, coords.y);
+    clockDrawingData.push({
+        type: 'start',
+        x: coords.x,
+        y: coords.y,
+        time: Date.now() - clockStartTime,
+        mode: clockDrawingMode
+    });
+}
+
+function drawOnClock(e) {
+    if (!isClockDrawing) return;
+    
+    const coords = getClockCanvasCoords(e);
+    
+    if (clockDrawingMode === 'pen') {
+        clockCtx.globalCompositeOperation = 'source-over';
+        clockCtx.strokeStyle = '#1A3A47';
+        clockCtx.lineWidth = 3;
+    } else if (clockDrawingMode === 'erase') {
+        clockCtx.globalCompositeOperation = 'destination-out';
+        clockCtx.lineWidth = 20;
+    }
+    
+    clockCtx.lineTo(coords.x, coords.y);
+    clockCtx.stroke();
+    
+    clockDrawingData.push({
+        type: 'draw',
+        x: coords.x,
+        y: coords.y,
+        time: Date.now() - clockStartTime,
+        mode: clockDrawingMode
+    });
+}
+
+function stopClockDrawing() {
+    if (isClockDrawing) {
+        clockDrawingData.push({
+            type: 'end',
+            time: Date.now() - clockStartTime
+        });
+    }
+    isClockDrawing = false;
+    clockCtx.beginPath();
+}
+
+function handleClockTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    clockCanvas.dispatchEvent(mouseEvent);
+}
+
+function setDrawingMode(mode) {
+    clockDrawingMode = mode;
+    document.getElementById('penBtn').classList.toggle('active', mode === 'pen');
+    document.getElementById('eraseBtn').classList.toggle('active', mode === 'erase');
+}
+
+function clearClockCanvas() {
+    if (confirm('Are you sure you want to clear your drawing?')) {
+        clockCtx.fillStyle = '#FFFFFF';
+        clockCtx.fillRect(0, 0, clockCanvas.width, clockCanvas.height);
+        clockDrawingData = [];
+        clockDrawingData.push({
+            type: 'clear',
+            time: Date.now() - clockStartTime
+        });
+    }
 }
 
 // Timer functions
