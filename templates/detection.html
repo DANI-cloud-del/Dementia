@@ -3,24 +3,24 @@
 {% block title %}Cognitive Detection - Silent Guardian{% endblock %}
 
 {% block content %}
+
 <section class="detection-section">
     <div class="detection-container">
         <!-- Page Header -->
         <div class="detection-header">
-            <button class="back-btn" onclick="window.location.href='{{ url_for('home') }}'">
+            <button class="back-btn" onclick="window.location.href = '{{ url_for('home') }}'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <line x1="19" y1="12" x2="5" y2="12" stroke-width="2"></line>
                     <polyline points="12 19 5 12 12 5" stroke-width="2"></polyline>
                 </svg>
                 <span>Home</span>
             </button>
-            
             <div class="header-content">
                 <h1>Cognitive Activities</h1>
                 <p>Choose an activity to keep your mind sharp and active</p>
             </div>
         </div>
-        
+
         <!-- Activity Selection Grid -->
         <div class="activity-grid">
             <!-- Memory Games Card -->
@@ -35,9 +35,9 @@
                 <h3>Memory Games</h3>
                 <p>Fun activities to improve memory and recall</p>
                 <ul class="activity-features">
-                    <li>Word recall games</li>
-                    <li>Pattern matching</li>
-                    <li>Number sequences</li>
+                    <li>✓ Word recall games</li>
+                    <li>✓ Pattern matching</li>
+                    <li>✓ Number sequences</li>
                 </ul>
                 <button class="activity-start-btn" onclick="startActivity('games')">Start Games</button>
             </div>
@@ -46,21 +46,21 @@
             <div class="activity-card" data-activity="clock">
                 <div class="activity-icon clock-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
-                        <polyline points="12 6 12 12 16 14" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                        <polyline points="12 6 12 12 16 14" stroke-width="2"></polyline>
                     </svg>
                 </div>
                 <h3>Clock Drawing Test</h3>
                 <p>Draw a clock to assess cognitive function</p>
                 <ul class="activity-features">
-                    <li>Visuospatial ability</li>
-                    <li>Executive function</li>
-                    <li>Gold standard assessment</li>
+                    <li>✓ Visuospatial ability</li>
+                    <li>✓ Executive function</li>
+                    <li>✓ Gold standard assessment</li>
                 </ul>
                 <button class="activity-start-btn" onclick="startActivity('clock')">Start Test</button>
             </div>
-            
-            <!-- Image Description Card -->
+
+            <!-- Picture Description Card -->
             <div class="activity-card" data-activity="image">
                 <div class="activity-icon image-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -72,13 +72,13 @@
                 <h3>Picture Description</h3>
                 <p>Describe images to analyze cognitive patterns</p>
                 <ul class="activity-features">
-                    <li>Speech pattern analysis</li>
-                    <li>Narrative complexity</li>
-                    <li>Emotional tone detection</li>
+                    <li>✓ Speech pattern analysis</li>
+                    <li>✓ Narrative complexity</li>
+                    <li>✓ Emotional tone detection</li>
                 </ul>
                 <button class="activity-start-btn" onclick="startActivity('image')">Start Description</button>
             </div>
-            
+
             <!-- Story Telling Card -->
             <div class="activity-card" data-activity="story">
                 <div class="activity-icon story-icon">
@@ -90,14 +90,37 @@
                 <h3>Story Telling</h3>
                 <p>Share memories and create narratives</p>
                 <ul class="activity-features">
-                    <li>Memory recall</li>
-                    <li>Narrative skills</li>
-                    <li>Emotional expression</li>
+                    <li>✓ Memory recall</li>
+                    <li>✓ Narrative skills</li>
+                    <li>✓ Emotional expression</li>
                 </ul>
                 <button class="activity-start-btn" onclick="startActivity('story')">Tell a Story</button>
             </div>
-            
-            <!-- Conversation Test Card -->
+
+            <!-- Chess Game Card - NEW -->
+            <div class="activity-card" data-activity="chess">
+                <div class="activity-icon chess-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="2" y="2" width="20" height="20" rx="2" stroke-width="2"></rect>
+                        <line x1="2" y1="8" x2="22" y2="8" stroke-width="1.5"></line>
+                        <line x1="2" y1="14" x2="22" y2="14" stroke-width="1.5"></line>
+                        <line x1="8" y1="2" x2="8" y2="22" stroke-width="1.5"></line>
+                        <line x1="14" y1="2" x2="14" y2="22" stroke-width="1.5"></line>
+                        <path d="M12 6L14 10H10Z" fill="currentColor"></path>
+                        <circle cx="18" cy="18" r="1.5" fill="currentColor"></circle>
+                    </svg>
+                </div>
+                <h3>Chess with Nila</h3>
+                <p>Strategic thinking and cognitive engagement</p>
+                <ul class="activity-features">
+                    <li>✓ Strategic planning</li>
+                    <li>✓ Executive function</li>
+                    <li>✓ Decision making</li>
+                </ul>
+                <button class="activity-start-btn" onclick="startActivity('chess')">Play Chess</button>
+            </div>
+
+            <!-- Guided Conversation Card -->
             <div class="activity-card" data-activity="conversation">
                 <div class="activity-icon conversation-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -109,14 +132,14 @@
                 <h3>Guided Conversation</h3>
                 <p>Natural dialogue for cognitive assessment</p>
                 <ul class="activity-features">
-                    <li>Open-ended questions</li>
-                    <li>Response analysis</li>
-                    <li>Social cognition</li>
+                    <li>✓ Open-ended questions</li>
+                    <li>✓ Response analysis</li>
+                    <li>✓ Social cognition</li>
                 </ul>
                 <button class="activity-start-btn" onclick="startActivity('conversation')">Start Chat</button>
             </div>
         </div>
-        
+
         <!-- Activity Content Area (Hidden by default) -->
         <div class="activity-content" id="activityContent" style="display: none;">
             <div class="content-header">
@@ -129,12 +152,15 @@
                 </button>
                 <h2 id="activityTitle">Activity Title</h2>
             </div>
-            
+
             <div class="content-body" id="activityBody">
                 <!-- Dynamic content will be loaded here -->
             </div>
         </div>
     </div>
+
+    <!-- Chess Board Container - NEW -->
+    <div id="chess-game-container" class="chess-game-wrapper" style="display: none;"></div>
 </section>
 
 <!-- Include the mini helper bot -->
@@ -149,8 +175,8 @@
             <line x1="12" y1="17" x2="12.01" y2="17"></line>
         </svg>
         <span class="sos-text">SOS</span>
-        <div class="sos-pulse"></div>
     </a>
+    <div class="sos-pulse"></div>
 </div>
 
 {% endblock %}
@@ -158,12 +184,68 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/enhanced_tts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/windows_voice_helper.js') }}"></script>
-
 <!-- <script src="{{ url_for('static', filename='js/smart_ai_guide.js') }}"></script> -->
-
+ <script src="{{ url_for('static', filename='js/nila_core.js') }}"></script>
 <script src="{{ url_for('static', filename='js/detection.js') }}"></script>
+<script src="{{ url_for('static', filename='js/helper_bot.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chess-game.js') }}"></script>
+
+<!-- Chess Game Scripts - NEW -->
+<script src="{{ url_for('static', filename='js/chess.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chess-ui.js') }}"></script>
+
+<script>
+    // Handle chess game activity
+    const originalStartActivity = window.startActivity;
+    window.startActivity = function(activity) {
+        if (activity === 'chess') {
+            // Show chess container
+            document.getElementById('activityContent').style.display = 'none';
+            document.getElementById('chess-game-container').style.display = 'block';
+            document.querySelector('.activity-grid').style.display = 'none';
+            
+            // Initialize chess if not already done
+            if (!window.chessUI) {
+                window.chessUI = new ChessUI('chess-game-container');
+            }
+        } else {
+            // Hide chess container for other activities
+            document.getElementById('chess-game-container').style.display = 'none';
+            // Call original function
+            if (originalStartActivity) {
+                originalStartActivity(activity);
+            }
+        }
+    };
+
+    // Update back button to handle chess
+    document.addEventListener('DOMContentLoaded', () => {
+        const backBtn = document.getElementById('backToSelection');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                document.getElementById('activityContent').style.display = 'none';
+                document.getElementById('chess-game-container').style.display = 'none';
+                document.querySelector('.activity-grid').style.display = 'grid';
+            });
+        }
+    });
+</script>
 
 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chess-game.css') }}">
 
-<script src="{{ url_for('static', filename='js/nila_core.js') }}"></script>
+<script>
+    function startActivity(activity) {
+        if (activity === 'chess') {
+            const container = document.getElementById('chess-game-container');
+            container.style.display = 'block';
+            document.querySelector('.activity-grid').style.display = 'none';
+            document.getElementById('activityContent').style.display = 'none';
+            
+            // Initialize chess
+            window.chessGame = new ChessGame('chess-game-container');
+        }
+    }
+</script>
+
 {% endblock %}

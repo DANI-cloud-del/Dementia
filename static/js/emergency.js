@@ -18,7 +18,7 @@ const currentLocation = document.getElementById('currentLocation');
 
 // State
 let countdownTimer = null;
-let countdownSeconds = 30;
+let countdownSeconds = 15; // Changed from 30 to 15
 let holdTimer = null;
 let isHolding = false;
 let userLocation = null;
@@ -127,7 +127,7 @@ function activateEmergency() {
 
 // Start Countdown
 function startCountdown() {
-    countdownSeconds = 30;
+    countdownSeconds = 15; // Changed from 30 to 15
     const circumference = 2 * Math.PI * 90; // radius = 90
     
     countdownTimer = setInterval(() => {
@@ -135,11 +135,11 @@ function startCountdown() {
         countdownNumber.textContent = countdownSeconds;
         
         // Update progress circle
-        const offset = circumference - (countdownSeconds / 30) * circumference;
+        const offset = circumference - (countdownSeconds / 15) * circumference; // Changed from 30 to 15
         countdownProgress.style.strokeDashoffset = offset;
         
-        // Play sound every 10 seconds (optional)
-        if (countdownSeconds === 20 || countdownSeconds === 10) {
+        // Play sound every 5 seconds (changed from 10)
+        if (countdownSeconds === 10 || countdownSeconds === 5) {
             if (navigator.vibrate) {
                 navigator.vibrate(100);
             }
@@ -151,7 +151,7 @@ function startCountdown() {
         }
     }, 1000);
     
-    console.log('⏱️ Countdown started: 30 seconds');
+    console.log('⏱️ Countdown started: 15 seconds'); // Updated log message
 }
 
 // Cancel Emergency
@@ -173,8 +173,8 @@ if (cancelSOSBtn) {
         emergencySection.classList.remove('alert-active');
         
         // Reset countdown
-        countdownSeconds = 30;
-        countdownNumber.textContent = '30';
+        countdownSeconds = 15; // Changed from 30 to 15
+        countdownNumber.textContent = '15'; // Changed from '30' to '15'
         countdownProgress.style.strokeDashoffset = 0;
         
         // Show notification
