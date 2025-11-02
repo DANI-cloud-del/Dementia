@@ -724,6 +724,162 @@ def logout():
     session.clear()
     return render_template('logout.html')
 
+@app.route('/api/nila/chat', methods=['POST'])
+def nila_chat():
+    """Unified Nila AI endpoint - handles all conversations with context awareness"""
+    try:
+        data = request.json
+        user_message = data.get('message', '')
+        conversation_history = data.get('history', [])
+        screen_context = data.get('screen_context', {})
+        current_page = data.get('current_page', '')
+        
+        print(f"📥 Nila received: {user_message}")
+        print(f"📍 Current page: {current_page}")
+        
+        # Page descriptions for context
+        page_descriptions = {
+            'home': 'the homepage showing an overview of features',
+            'dashboard': 'the dashboard with user stats and quick actions',
+            'detection': 'the cognitive activities page with memory games',
+            'companion': 'the AI companion chat page',
+            'emergency': 'the emergency SOS page',
+            'profile': 'the user profile and settings page',
+        }
+        current_page_desc = page_descriptions.get(current_page, 'a page in the app')
+        
+        # FIXED: Better system prompt - NO emergency triggering
+        system_prompt = f"""You are Nila, a warm, caring AI companion for a dementia care platform called Silent Guardian.
+
+Current context:
+- User is on {current_page_desc}
+- Page title: {screen_context.get('title', 'Unknown')}
+- Available features on this page: {', '.join(screen_context.get('content', {}).get('buttons', [])[:5])}
+
+Your personality:
+- Warm, patient, and empathetic
+- Use simple, clear language
+- Always remember you can help users navigate the app
+- You remember past conversations
+
+Key capabilities:
+1. Explain what's on the current page
+2. Help navigate to: home, dashboard, activities/games, companion, emergency, profile, lifevault (QR code)
+3. Answer questions about dementia care features
+4. Provide emotional support and companionship
+
+IMPORTANT RULES:
+- NEVER mention emergency, SOS, or urgent help unless the user EXPLICITLY asks for it
+- Do NOT assume the user needs help when they greet you
+- Greetings like "Hi", "Hello", "Hey" should be responded to warmly, NOT with emergency offers
+- Only suggest emergency features if user says: "emergency", "help me", "I need help", "SOS", etc.
+- Keep responses brief (2-3 sentences max) and conversational
+- Be friendly and supportive, not alarming
+
+Examples:
+User: "Hi" → You: "Hi! How are you doing today? I'm here if you'd like to chat or explore any features."
+User: "Hello Nila" → You: "Hello! It's great to hear from you. What can I help you with?"
+User: "Take me to life vault" → You: "Sure! Opening Life-Vault now."
+User: "What's this page?" → You: "You're on {current_page_desc}. Would you like me to explain any of the features here?"
+"""
+
+        
+        # Build conversation messages
+        messages = [{"role": "system", "content": system_prompt}]
+        
+        # Add conversation history (last 10 messages)
+        for msg in conversation_history[-10:]:
+            messages.append({
+                "role": msg.get('role', 'user'),
+                "content": msg.get('content', '')
+            })
+        
+        # Add current user message
+        messages.append({"role": "user", "content": user_message})
+        
+        # Navigation detection (before AI response)
+        # Navigation detection (before AI response) - IMPROVED FOR VOICE
+        navigation_map = {
+            'home': ('/', 'navigate_home'),
+            'dashboard': ('dashboard', 'navigate_dashboard'),
+            'detection': ('detection', 'navigate_detection'),
+            'games': ('detection', 'navigate_detection'),
+            'activities': ('detection', 'navigate_detection'),
+            'companion': ('companion', 'navigate_companion'),
+            'emergency': ('emergency', 'navigate_emergency'),
+            'profile': ('profile', 'navigate_profile'),
+            'lifevault': ('lifevault', 'navigate_lifevault'),
+            'life vault': ('lifevault', 'navigate_lifevault'),
+            'qr': ('lifevault', 'navigate_lifevault'),
+            'vault': ('lifevault', 'navigate_lifevault'),  # ADDED - catches partial matches
+            'life': ('lifevault', 'navigate_lifevault'),   # ADDED - if they just say "life"
+        }
+
+        lower_message = user_message.lower()
+
+        # Check for navigation requests
+        for key, (url, action) in navigation_map.items():
+            # IMPROVED: More flexible matching for voice recognition
+            if key in lower_message and any(trigger in lower_message for trigger in ['take me', 'go to', 'navigate', 'open', 'show', 'bring me']):
+                return jsonify({
+                    'message': f"Sure! Taking you to {key.replace('_', ' ')} now.",
+                    'action': action,
+                    'speak': True
+                })
+
+        # ADDED: Special case for Life-Vault (catches common mishearings)
+        lifevault_patterns = ['life vault', 'lifevault', 'life bold', 'life bolt', 'live vault', 'qr code', 'qr']
+        if any(pattern in lower_message for pattern in lifevault_patterns) and any(trigger in lower_message for trigger in ['take me', 'go to', 'navigate', 'open', 'show', 'bring me']):
+            return jsonify({
+                'message': "Sure! Opening Life-Vault now.",
+                'action': 'navigate_lifevault',
+                'speak': True
+            })
+        
+        # Call Groq API
+        if groq_client:
+            chat_completion = groq_client.chat.completions.create(
+                messages=messages,
+                model=GROQ_MODELS['quality'],  # Using quality model
+                temperature=0.7,
+                max_tokens=200,
+            )
+            ai_response = chat_completion.choices[0].message.content
+            
+            # FIXED: Filter out any emergency mentions in greeting responses
+            if any(greeting in user_message.lower() for greeting in ['hi', 'hello', 'hey', 'good morning', 'good afternoon']):
+                # Remove emergency-related text from AI greeting responses
+                emergency_phrases = ['emergency', 'urgent', 'help right away', 'assistance right away', 'activating']
+                for phrase in emergency_phrases:
+                    if phrase.lower() in ai_response.lower():
+                        # Replace with a normal greeting
+                        ai_response = "Hi! I'm Nila, your personal assistant. How can I help you today?"
+                        print(f"⚠️ Filtered emergency mention from greeting")
+                        break
+            
+            return jsonify({
+                'message': ai_response,
+                'action': None,
+                'speak': True
+            })
+        else:
+            return jsonify({
+                'message': "I'm having trouble connecting to my brain. Please check the API configuration.",
+                'action': None,
+                'speak': True
+            }), 500
+            
+    except Exception as e:
+        print(f"❌ Nila chat error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'message': "I'm having a moment. Could you try again?",
+            'action': None,
+            'speak': True
+        }), 500
+
+
 
 # ============================================
 # RUN APPLICATION

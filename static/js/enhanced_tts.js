@@ -220,12 +220,14 @@ class EnhancedTTS {
     }
 
     stop() {
+    if (this.isSpeaking && this.currentUtterance) {
         speechSynthesis.cancel();
         this.isSpeaking = false;
         this.isPaused = false;
-        this.currentUtterance = null;
-        this.hidePlayerControls();
+        console.log('🛑 TTS stopped');
     }
+}
+
 
     pause() {
         if (this.isSpeaking && !this.isPaused) {
@@ -354,6 +356,8 @@ class EnhancedTTS {
         return 'Variable';
     }
 }
+
+
 
 // Initialize and expose globally
 window.enhancedTTS = new EnhancedTTS();

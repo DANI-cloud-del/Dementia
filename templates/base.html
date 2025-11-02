@@ -14,6 +14,10 @@
         }
     </script>
     
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nila.css') }}">
+    
     <!-- Custom CSS Only -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
@@ -64,8 +68,11 @@
     <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
 
     {% block extra_js %}
-        <script src="{{ url_for('static', filename='js/enhanced_tts.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/companion.js') }}"></script>
+         <!-- Enhanced TTS System (Nila's voice) -->
+    <script src="{{ url_for('static', filename='js/enhanced_tts.js') }}"></script>
+    
+    <!-- Nila Core AI System - Loaded on ALL pages -->
+    <script src="{{ url_for('static', filename='js/nila_core.js') }}"></script>
     {% endblock %}
 
 </body>
