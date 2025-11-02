@@ -1,16 +1,20 @@
 // ============================================
-// NILA - FIXED: NO AUTO EMERGENCY NAVIGATION
+// NILA - PERSISTENT ACROSS PAGES
+// Remembers state, conversation, and mic settings
 // ============================================
 
 class NilaAI {
     constructor() {
         console.log('💙 Nila AI Initializing...');
         
-        // Core state
-        this.isActive = false;
+        // Load saved state from localStorage
+        const savedState = this.loadState();
+        
+        // Core state (restored from localStorage)
+        this.isActive = savedState.isActive || false;
         this.isListening = false;
         this.isSpeaking = false;
-        this.micEnabled = true;
+        this.micEnabled = savedState.micEnabled !== undefined ? savedState.micEnabled : true;
         this.typingMode = false;
         
         // Memory and context
@@ -38,6 +42,21 @@ class NilaAI {
         this.init();
     }
 
+    // Add new state persistence methods
+    loadState() {
+        const stored = localStorage.getItem('nila_state');
+        return stored ? JSON.parse(stored) : {};
+    }
+
+    saveState() {
+        const state = {
+            isActive: this.isActive,
+            micEnabled: this.micEnabled,
+            timestamp: Date.now()
+        };
+        localStorage.setItem('nila_state', JSON.stringify(state));
+    }
+
     init() {
         this.createNilaUI();
         this.initSpeechRecognition();
@@ -45,9 +64,37 @@ class NilaAI {
         this.initTTS();
         this.captureScreenContext();
         this.setupEventListeners();
-        this.startMessageRotation();
         
-        console.log('✅ Nila AI Ready');
+        // Restore active state if it was active before navigation
+        if (this.isActive) {
+            console.log('📍 Restoring Nila state from previous page');
+            this.restoreActiveState();
+        } else {
+            this.startMessageRotation();
+        }
+        
+        console.log('✅ Nila AI Ready on', this.currentPage);
+    }
+
+    restoreActiveState() {
+        this.stopMessageRotation();
+        
+        // Restore UI state
+        document.getElementById('nila-pill').classList.add('active');
+        document.getElementById('nila-controls').classList.add('show');
+        
+        this.updateMessage('I\'m still here!');
+        
+        // Restore mic if it was enabled
+        if (this.micEnabled) {
+            setTimeout(() => {
+                try {
+                    this.recognition.start();
+                } catch (e) {
+                    console.error('Start failed:', e);
+                }
+            }, 1000);
+        }
     }
 
     detectCurrentPage() {
@@ -57,6 +104,8 @@ class NilaAI {
         if (path.includes('detection')) return 'detection';
         if (path.includes('companion')) return 'companion';
         if (path.includes('emergency')) return 'emergency';
+        if (path.includes('profile')) return 'profile';
+        if (path.includes('lifevault')) return 'lifevault';
         return 'home';
     }
 
@@ -516,6 +565,8 @@ isEmergencyCommand(message) {
         if (this.isActive) return;
         
         this.isActive = true;
+        this.saveState(); // Add state persistence
+        
         this.stopMessageRotation();
         
         document.getElementById('nila-pill').classList.add('active');
@@ -540,6 +591,7 @@ isEmergencyCommand(message) {
 
     deactivateNila() {
         this.isActive = false;
+        this.saveState(); // Add state persistence
         
         if (this.recognition) {
             this.recognition.stop();
@@ -560,6 +612,7 @@ isEmergencyCommand(message) {
 
     toggleMic() {
         this.micEnabled = !this.micEnabled;
+        this.saveState(); // Add state persistence
         
         const micIcon = document.querySelector('.mic-icon');
         const micOffIcon = document.querySelector('.mic-off-icon');
