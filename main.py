@@ -749,43 +749,77 @@ def nila_chat():
         current_page_desc = page_descriptions.get(current_page, 'a page in the app')
         
         # FIXED: Better system prompt - NO emergency triggering
-        system_prompt = f"""You are Nila, a warm, caring AI companion for a dementia care platform called Silent Guardian.
+        SYSTEM_PROMPT = """You are Nila, an intelligent AI guide for Silent Guardian – a dementia DETECTION and ASSESSMENT platform.
 
-Current context:
-- User is on {current_page_desc}
-- Page title: {screen_context.get('title', 'Unknown')}
-- Available features on this page: {', '.join(screen_context.get('content', {}).get('buttons', [])[:5])}
+**CRITICAL CONTEXT: This is a TESTING/DETECTION tool for cognitive assessment, NOT a care app for diagnosed dementia patients.**
 
-Your personality:
-- Warm, patient, and empathetic
-- Use simple, clear language
-- Always remember you can help users navigate the app
-- You remember past conversations
+About Silent Guardian:
+- Cognitive Activities: Memory games, picture descriptions, clock drawing, chess puzzles
+- Detection Tests: Assess cognitive function through structured activities
+- Life-Vault: Emergency profile with medical information
+- Dashboard: Track and review test results over time
+- Quick Navigation: Move seamlessly between features
 
-Key capabilities:
-1. Explain what's on the current page
-2. Help navigate to: home, dashboard, activities/games, companion, emergency, profile, lifevault (QR code)
-3. Answer questions about dementia care features
-4. Provide emotional support and companionship
+Your Role:
+1. Guide users through cognitive detection activities
+2. Explain what each test measures and why
+3. Provide professional but warm support during assessments
+4. Navigate users to specific features quickly
+5. Answer questions about cognitive health and testing
+
+Communication Style:
+- Professional, clear, and encouraging (not patronizing)
+- Assume user is cognitively intact – they're here to TEST, not because they're impaired
+- Keep responses brief (2-3 sentences)
+- Use simple language but respect user intelligence
+- Avoid "dementia" language – use "cognitive assessment" or "memory testing"
 
 IMPORTANT RULES:
-- NEVER mention emergency, SOS, or urgent help unless the user EXPLICITLY asks for it
-- Do NOT assume the user needs help when they greet you
-- Greetings like "Hi", "Hello", "Hey" should be responded to warmly, NOT with emergency offers
-- Only suggest emergency features if user says: "emergency", "help me", "I need help", "SOS", etc.
-- Keep responses brief (2-3 sentences max) and conversational
-- Be friendly and supportive, not alarming
+- Do NOT treat user as impaired
+- Do NOT use infantilizing language
+- Do NOT assume they need emergency help
+- Only suggest emergency features if user explicitly requests help
+- Focus on activity explanations and navigation
 
-Examples:
-User: "Hi" → You: "Hi! How are you doing today? I'm here if you'd like to chat or explore any features."
-User: "Hello Nila" → You: "Hello! It's great to hear from you. What can I help you with?"
-User: "Take me to life vault" → You: "Sure! Opening Life-Vault now."
-User: "What's this page?" → You: "You're on {current_page_desc}. Would you like me to explain any of the features here?"
-"""
+Navigation Commands You Understand:
+- "Take me to [page]" → Navigate to home, dashboard, detection, companion, emergency, profile, lifevault
+- "Show me [activity]" → Start memory games, picture description, clock drawing, chess, story, conversation
+- "What's on this page?" → Explain current page features
+- "How do I [use feature]?" → Explain how features work
+
+Example Responses:
+
+User: "Hi Nila"
+You: "Hi! Welcome to Silent Guardian. I can help you explore cognitive activities or navigate anywhere in the app. What would you like to do?"
+
+User: "What's memory games?"
+You: "Memory games test your recall ability. You'll see pairs of cards and match them – simple but effective for assessing cognitive function. Want to start?"
+
+User: "Take me to detection"
+You: "Opening the detection page now. You'll see all our cognitive activities there."
+
+User: "I'm confused"
+You: "That's okay. Which part would you like help with? I can explain any activity or take you to a specific page."
+
+User: "I need help"
+You: "What do you need help with? I can explain features, navigate pages, or if it's urgent, I can take you to emergency contact options."
+
+NEVER RESPOND WITH:
+- "You might have dementia..."
+- "Let me check your condition..."
+- "Since you're struggling..."
+- Patronizing tone or simple words unnecessary for adults
+
+BE READY FOR:
+- Users who are anxious about testing
+- Users testing themselves preventatively
+- Family members administering tests
+- Professional cognitive assessments"""
+
 
         
         # Build conversation messages
-        messages = [{"role": "system", "content": system_prompt}]
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         
         # Add conversation history (last 10 messages)
         for msg in conversation_history[-10:]:
@@ -878,6 +912,124 @@ User: "What's this page?" → You: "You're on {current_page_desc}. Would you lik
             'action': None,
             'speak': True
         }), 500
+        
+
+@app.route('/api/nila/navigate', methods=['POST'])
+def nila_navigate():
+    """Handle voice-triggered navigation with intelligent command parsing"""
+    try:
+        data = request.json
+        user_command = data.get('command', '').lower()
+        current_page = data.get('current_page', '')
+        
+        # Navigation keyword mapping
+        navigation_keywords = {
+            'home': {
+                'keywords': ['home', 'main', 'homepage', 'start', 'beginning', 'go back'],
+                'url': '/',
+                'message': 'Taking you home.'
+            },
+            'dashboard': {
+                'keywords': ['dashboard', 'results', 'progress', 'stats', 'overview'],
+                'url': '/dashboard',
+                'message': 'Opening your dashboard.'
+            },
+            'detection': {
+                'keywords': ['detection', 'activities', 'games', 'tests', 'cognitive', 'brain'],
+                'url': '/detection',
+                'message': 'Going to cognitive activities.'
+            },
+            'companion': {
+                'keywords': ['companion', 'chat', 'talk', 'ai', 'assistant', 'speak'],
+                'url': '/companion',
+                'message': 'Opening the AI companion.'
+            },
+            'emergency': {
+                'keywords': ['emergency', 'sos', 'help', 'urgent', 'call'],
+                'url': '/emergency',
+                'message': 'Taking you to emergency contacts.'
+            },
+            'profile': {
+                'keywords': ['profile', 'settings', 'account', 'personal', 'preferences'],
+                'url': '/profile',
+                'message': 'Opening your profile.'
+            },
+            'lifevault': {
+                'keywords': ['lifevault', 'life vault', 'vault', 'qr', 'emergency info', 'medical'],
+                'url': '/lifevault',
+                'message': 'Opening Life-Vault.'
+            }
+        }
+        
+        # Activity-specific commands (on detection page)
+        if current_page == 'detection':
+            activity_keywords = {
+                'games': {
+                    'keywords': ['memory', 'game', 'match', 'sequence', 'recall'],
+                    'action': 'start_memory_games',
+                    'message': 'Starting memory games.'
+                },
+                'picture': {
+                    'keywords': ['picture', 'image', 'describe', 'photo', 'visual'],
+                    'action': 'start_picture_description',
+                    'message': 'Opening picture description.'
+                },
+                'clock': {
+                    'keywords': ['clock', 'draw', 'drawing', 'sketch'],
+                    'action': 'start_clock_drawing',
+                    'message': 'Starting clock drawing test.'
+                },
+                'chess': {
+                    'keywords': ['chess', 'puzzle', 'strategy', 'game'],
+                    'action': 'start_chess',
+                    'message': 'Starting chess.'
+                },
+                'story': {
+                    'keywords': ['story', 'narrative', 'storytelling', 'tale'],
+                    'action': 'start_story',
+                    'message': 'Opening storytelling activity.'
+                },
+                'conversation': {
+                    'keywords': ['conversation', 'dialog', 'dialogue', 'discuss'],
+                    'action': 'start_conversation',
+                    'message': 'Starting guided conversation.'
+                }
+            }
+            
+            # Check activity keywords first
+            for activity, details in activity_keywords.items():
+                if any(kw in user_command for kw in details['keywords']):
+                    return jsonify({
+                        'success': True,
+                        'message': details['message'],
+                        'action': details['action'],
+                        'navigate': None
+                    })
+        
+        # Check page navigation
+        for page, details in navigation_keywords.items():
+            if any(kw in user_command for kw in details['keywords']):
+                # Verify it's a navigation request
+                if any(trigger in user_command for trigger in ['take me', 'go to', 'open', 'show', 'navigate', 'bring me']):
+                    return jsonify({
+                        'success': True,
+                        'message': details['message'],
+                        'action': None,
+                        'navigate': details['url']
+                    })
+        
+        # No match found
+        return jsonify({
+            'success': False,
+            'message': 'I can help you navigate. Where would you like to go?',
+            'action': None,
+            'navigate': None
+        })
+        
+    except Exception as e:
+        print(f"Navigation error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 
 
@@ -900,5 +1052,5 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     
     # Run in production mode
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=True)
 
