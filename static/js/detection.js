@@ -30,14 +30,33 @@ const activities = {
     conversation: {
         title: 'Guided Conversation',
         content: generateConversationContent()
+    },
+    // Add chess activity
+    chess: {
+        title: 'Chess with Nila',
+        content: '<div id="chess-game-container" class="chess-game-wrapper"></div>'
     }
 };
 
 // Start Activity
 function startActivity(type) {
     console.log('🎮 Starting activity:', type);
-    const activity = activities[type];
     
+    // Special handling for chess
+    if (type === 'chess') {
+        document.querySelector('.activity-grid').style.display = 'none';
+        const container = document.getElementById('chess-game-container');
+        if (container) {
+            container.style.display = 'block';
+            // Initialize chess
+            if (window.chessUI) {
+                window.chessUI.init();
+            }
+        }
+        return;
+    }
+    
+    const activity = activities[type];
     if (!activity) {
         console.error('❌ Activity not found:', type);
         return;
@@ -1249,7 +1268,7 @@ function addAIMessage(message) {
     messageDiv.innerHTML = `
         <div class="message-avatar">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                ircle cx="12" cycy="8" r="7"/>
+                ircle cx="12" cy="8" r="7"7"/>
                 <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
             </svg>
         </div>
@@ -2327,3 +2346,4 @@ function startClockDrawing() {
         window.aiOrb.clockDrawingGuide();
     }
 }
+

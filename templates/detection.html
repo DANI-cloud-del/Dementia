@@ -97,28 +97,36 @@
                 <button class="activity-start-btn" onclick="startActivity('story')">Tell a Story</button>
             </div>
 
-            <!-- Chess Game Card - NEW -->
-            <div class="activity-card" data-activity="chess">
-                <div class="activity-icon chess-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <rect x="2" y="2" width="20" height="20" rx="2" stroke-width="2"></rect>
-                        <line x1="2" y1="8" x2="22" y2="8" stroke-width="1.5"></line>
-                        <line x1="2" y1="14" x2="22" y2="14" stroke-width="1.5"></line>
-                        <line x1="8" y1="2" x2="8" y2="22" stroke-width="1.5"></line>
-                        <line x1="14" y1="2" x2="14" y2="22" stroke-width="1.5"></line>
-                        <path d="M12 6L14 10H10Z" fill="currentColor"></path>
-                        <circle cx="18" cy="18" r="1.5" fill="currentColor"></circle>
-                    </svg>
-                </div>
-                <h3>Chess with Nila</h3>
-                <p>Strategic thinking and cognitive engagement</p>
-                <ul class="activity-features">
-                    <li>✓ Strategic planning</li>
-                    <li>✓ Executive function</li>
-                    <li>✓ Decision making</li>
-                </ul>
-                <button class="activity-start-btn" onclick="startActivity('chess')">Play Chess</button>
-            </div>
+<!-- Chess Game Card -->
+<div class="activity-card" data-activity="chess">
+    <div class="activity-icon story-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Chess Pawn - Simple and Clean -->
+            <!-- Head -->
+            <circle cx="50" cy="25" r="8"/>
+            
+            <!-- Neck -->
+            <line x1="50" y1="33" x2="50" y2="40"/>
+            
+            <!-- Body (diamond shape) -->
+            <path d="M 45 40 L 35 50 L 45 60 L 50 58 L 55 60 L 65 50 L 55 40 Z"/>
+            
+            <!-- Base -->
+            <ellipse cx="50" cy="70" rx="15" ry="8"/>
+            <line x1="35" y1="70" x2="65" y2="70" stroke-width="3"/>
+        </svg>
+    </div>
+    <h3>Chess with Nila</h3>
+    <p>Strategic thinking and cognitive engagement</p>
+    <ul class="activity-features">
+        <li>✓ Strategic planning</li>
+        <li>✓ Executive function</li>
+        <li>✓ Decision making</li>
+    </ul>
+    <button class="activity-start-btn" onclick="startActivity('chess')">Play Chess</button>
+</div>
+
+
 
             <!-- Guided Conversation Card -->
             <div class="activity-card" data-activity="conversation">
@@ -157,10 +165,10 @@
                 <!-- Dynamic content will be loaded here -->
             </div>
         </div>
-    </div>
 
-    <!-- Chess Board Container - NEW -->
-    <div id="chess-game-container" class="chess-game-wrapper" style="display: none;"></div>
+        <!-- Chess Board Container -->
+        <div id="chess-game-container" style="display: none;"></div>
+    </div>
 </section>
 
 <!-- Include the mini helper bot -->
@@ -182,70 +190,118 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Core JS files -->
 <script src="{{ url_for('static', filename='js/enhanced_tts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/windows_voice_helper.js') }}"></script>
-<!-- <script src="{{ url_for('static', filename='js/smart_ai_guide.js') }}"></script> -->
- <script src="{{ url_for('static', filename='js/nila_core.js') }}"></script>
+
+<!-- Load detection.js FIRST (has original startActivity) -->
 <script src="{{ url_for('static', filename='js/detection.js') }}"></script>
-<script src="{{ url_for('static', filename='js/helper_bot.js') }}"></script>
+
+<!-- Chess Game (single unified file) -->
 <script src="{{ url_for('static', filename='js/chess-game.js') }}"></script>
 
-<!-- Chess Game Scripts - NEW -->
-<script src="{{ url_for('static', filename='js/chess.js') }}"></script>
-<script src="{{ url_for('static', filename='js/chess-ui.js') }}"></script>
+<!-- Nila Core -->
+<script src="{{ url_for('static', filename='js/nila_core.js') }}"></script>
 
+<!-- Helper Bot -->
+<script src="{{ url_for('static', filename='js/helper_bot.js') }}"></script>
+
+<!-- Chess Game Integration -->
 <script>
-    // Handle chess game activity
+(function() {
+    // Store original startActivity from detection.js
     const originalStartActivity = window.startActivity;
+    
+    // Override startActivity to handle chess
     window.startActivity = function(activity) {
+        console.log('🎮 Starting activity:', activity);
+        
         if (activity === 'chess') {
-            // Show chess container
-            document.getElementById('activityContent').style.display = 'none';
-            document.getElementById('chess-game-container').style.display = 'block';
-            document.querySelector('.activity-grid').style.display = 'none';
+            // Hide other sections
+            const activityContent = document.getElementById('activityContent');
+            const activityGrid = document.querySelector('.activity-grid');
+            const detectionHeader = document.querySelector('.detection-header');
+            const chessContainer = document.getElementById('chess-game-container');
             
-            // Initialize chess if not already done
-            if (!window.chessUI) {
-                window.chessUI = new ChessUI('chess-game-container');
+            if (activityContent) activityContent.style.display = 'none';
+            if (activityGrid) activityGrid.style.display = 'none';
+            if (detectionHeader) detectionHeader.style.display = 'none';
+            if (chessContainer) chessContainer.style.display = 'block';
+            
+            // Initialize chess game
+            if (!window.chessGame) {
+                try {
+                    window.chessGame = new ChessGame('chess-game-container');
+                    console.log('✅ Chess game initialized');
+                } catch (error) {
+                    console.error('❌ Chess initialization error:', error);
+                }
             }
         } else {
-            // Hide chess container for other activities
-            document.getElementById('chess-game-container').style.display = 'none';
-            // Call original function
-            if (originalStartActivity) {
-                originalStartActivity(activity);
+            // Hide chess for other activities
+            const chessContainer = document.getElementById('chess-game-container');
+            if (chessContainer) chessContainer.style.display = 'none';
+            
+            // Call original detection.js function
+            if (originalStartActivity && typeof originalStartActivity === 'function') {
+                try {
+                    originalStartActivity(activity);
+                } catch (error) {
+                    console.error('❌ Activity start error:', error);
+                }
+            } else {
+                console.error('❌ Original startActivity not found');
             }
         }
     };
-
-    // Update back button to handle chess
+    
+    // Handle back button
     document.addEventListener('DOMContentLoaded', () => {
         const backBtn = document.getElementById('backToSelection');
         if (backBtn) {
             backBtn.addEventListener('click', () => {
-                document.getElementById('activityContent').style.display = 'none';
-                document.getElementById('chess-game-container').style.display = 'none';
-                document.querySelector('.activity-grid').style.display = 'grid';
+                const activityContent = document.getElementById('activityContent');
+                const chessContainer = document.getElementById('chess-game-container');
+                const activityGrid = document.querySelector('.activity-grid');
+                const detectionHeader = document.querySelector('.detection-header');
+                
+                if (activityContent) activityContent.style.display = 'none';
+                if (chessContainer) chessContainer.style.display = 'none';
+                if (activityGrid) activityGrid.style.display = 'grid';
+                if (detectionHeader) detectionHeader.style.display = 'block';
             });
         }
     });
+})();
 </script>
 
-
+<!-- CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/chess-game.css') }}">
 
-<script>
-    function startActivity(activity) {
-        if (activity === 'chess') {
-            const container = document.getElementById('chess-game-container');
-            container.style.display = 'block';
-            document.querySelector('.activity-grid').style.display = 'none';
-            document.getElementById('activityContent').style.display = 'none';
-            
-            // Initialize chess
-            window.chessGame = new ChessGame('chess-game-container');
-        }
-    }
-</script>
+<style>
+/* Fix chess SVG visibility in light mode */
+.chess-icon svg {
+    stroke: currentColor;
+}
+
+.chess-icon svg path[fill="currentColor"],
+.chess-icon svg circle[fill="currentColor"] {
+    fill: #6B9BD6;
+}
+
+.dark-mode .chess-icon svg path[fill="currentColor"],
+.dark-mode .chess-icon svg circle[fill="currentColor"] {
+    fill: #e0e6ed;
+}
+
+/* Ensure chess container is properly styled */
+#chess-game-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+</style>
 
 {% endblock %}
+
