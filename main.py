@@ -1130,6 +1130,37 @@ def nila_navigate():
         print(f"Navigation error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/reminders')
+def reminders():
+    """Display all reminders for the user"""
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    
+    # TODO: Fetch reminders from database
+    reminders_data = [
+        {
+            'id': 1,
+            'title': 'Take Medication',
+            'type': 'medication',
+            'time': '10:30 AM',
+            'medicine': 'Aspirin',
+            'dosage': '500mg',
+            'note': 'Take with water after breakfast',
+            'completed': False
+        },
+        {
+            'id': 2,
+            'title': 'Doctor Appointment',
+            'type': 'appointment',
+            'time': '2:00 PM',
+            'doctor': 'Dr. Sharma',
+            'specialty': 'Neurologist',
+            'location': 'City Medical Center, Room 304',
+            'completed': False
+        }
+    ]
+    
+    return render_template('reminders.html', reminders=reminders_data)
 
 
 
