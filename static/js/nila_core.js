@@ -578,15 +578,15 @@ isEmergencyCommand(message) {
         this.speak(greeting);
         
         // Start listening if mic enabled
-        if (this.micEnabled) {
-            setTimeout(() => {
-                try {
-                    this.recognition.start();
-                } catch (e) {
-                    console.error('Start failed:', e);
-                }
-            }, 2000);
-        }
+        // if (this.micEnabled) {
+        //     setTimeout(() => {
+        //         try {
+        //             this.recognition.start();
+        //         } catch (e) {
+        //             console.error('Start failed:', e);
+        //         }
+        //     }, 2000);
+        // }
     }
 
     deactivateNila() {
